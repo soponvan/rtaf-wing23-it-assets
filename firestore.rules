@@ -1,0 +1,17 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAuthorizedUser() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email in [
+          'REPLACE_WITH_AUTHORIZED_GOOGLE_EMAIL'
+        ];
+    }
+
+    match /inventories/wing23-assets {
+      allow read, write: if isAuthorizedUser();
+    }
+  }
+}
