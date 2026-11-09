@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบบริหารจัดการสินทรัพย์ IT คอมพิวเตอร์ กองบิน 23 (บน.23)</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      font-family: 'Prompt', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.05);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(100, 116, 139, 0.4);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(100, 116, 139, 0.6);
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white shadow-lg sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-300 shadow-inner">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-bold tracking-tight flex items-center gap-2">
+            ระบบจัดการสินทรัพย์ IT คอมพิวเตอร์
+            <span class="text-xs font-normal px-2.5 py-0.5 rounded-full bg-blue-500/30 text-blue-200 border border-blue-400/30 font-semibold">กองบิน 23 (บน.23)</span>
+          </h1>
+          <p class="text-xs text-blue-200/70 hidden sm:block">บันทึก ตรวจสอบ และบริหารจัดการอุปกรณ์คอมพิวเตอร์และซอฟต์แวร์ ประจำหน่วยใน บน.23</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-2 sm:space-x-3">
+        <button onclick="exportToCSV()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-600 hover:bg-emerald-500 text-white shadow transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          <span class="hidden md:inline">ส่งออก</span> CSV
+        </button>
+        <button onclick="openModal()" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white shadow-md shadow-blue-900/30 transition-all hover:scale-[1.02]">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          + เพิ่มเครื่องคอมพิวเตอร์
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-6">
+
+    <!-- DASHBOARD STATS -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+        <div>
+          <p class="text-xs font-medium text-slate-500">คอมพิวเตอร์ทั้งหมด</p>
+          <p id="stat-total" class="text-2xl font-bold text-slate-800 mt-1">0</p>
+          <span class="text-[11px] text-blue-600 font-medium">เครื่องในระบบ</span>
+        </div>
+        <div class="w-11 h-11 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        </div>
+      </div>
+
+      <div class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+        <div>
+          <p class="text-xs font-medium text-slate-500">เครือข่ายภายใน ทอ.</p>
+          <p id="stat-internal" class="text-2xl font-bold text-indigo-700 mt-1">0</p>
+          <span class="text-[11px] text-indigo-500 font-medium">AirNet / Intranet</span>
+        </div>
+        <div class="w-11 h-11 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.099.99-4.328.99-6.632 0-6.075-4.925-11-11-11S-2 5.925-2 12c0 2.304.345 4.533.99 6.632"/></svg>
+        </div>
+      </div>
+
+      <div class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+        <div>
+          <p class="text-xs font-medium text-slate-500">ระบบปฏิบัติการ Windows 11</p>
+          <p id="stat-win11" class="text-2xl font-bold text-sky-700 mt-1">0</p>
+          <span class="text-[11px] text-sky-600 font-medium">สัดส่วนระบบใหม่</span>
+        </div>
+        <div class="w-11 h-11 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/></svg>
+        </div>
+      </div>
+
+      <div class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+        <div>
+          <p class="text-xs font-medium text-slate-500">Antivirus ติดตั้งพร้อม</p>
+          <p id="stat-av" class="text-2xl font-bold text-emerald-700 mt-1">0</p>
+          <span class="text-[11px] text-emerald-600 font-medium">มีระบบคุ้มครองความปลอดภัย</span>
+        </div>
+        <div class="w-11 h-11 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEARCH & FILTER TOOLBAR -->
+    <div class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm space-y-3">
+      <div class="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+        <div class="relative flex-1">
+          <svg class="w-4 h-4 text-slate-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <input type="text" id="searchInput" oninput="applyFilters()" placeholder="ค้นหาตาม หมายเลขพัสดุ ทอ., ชื่อเครื่อง, Serial number, ผู้รับผิดชอบ หรือสถานที่..." class="w-full pl-9 pr-4 py-2 text-xs sm:text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-slate-50/50">
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <select id="filterLocation" onchange="applyFilters()" class="text-xs py-2 px-2.5 border border-slate-200 rounded-lg bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">ทุกสถานที่ติดตั้ง</option>
+          </select>
+          <select id="filterNetwork" onchange="applyFilters()" class="text-xs py-2 px-2.5 border border-slate-200 rounded-lg bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">ทุกเครือข่าย</option>
+            <option value="ภายใน">เครือข่ายภายใน ทอ.</option>
+            <option value="ภายนอก">เครือข่ายภายนอก ทอ.</option>
+          </select>
+          <select id="filterBrand" onchange="applyFilters()" class="text-xs py-2 px-2.5 border border-slate-200 rounded-lg bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">ทุกยี่ห้อ</option>
+          </select>
+          <select id="filterYear" onchange="applyFilters()" class="text-xs py-2 px-2.5 border border-slate-200 rounded-lg bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">ทุกปีที่ติดตั้ง</option>
+          </select>
+          <button onclick="resetFilters()" class="px-2.5 py-2 text-xs text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors" title="ล้างตัวกรอง">
+            ล้างตัวกรอง
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ASSET TABLE -->
+    <div class="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
+      <div class="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/60">
+        <div class="flex items-center space-x-2">
+          <span class="font-semibold text-sm text-slate-800">รายการสินทรัพย์คอมพิวเตอร์</span>
+          <span id="recordCount" class="text-xs px-2 py-0.5 rounded-full bg-slate-200 text-slate-700 font-medium">0 รายการ</span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button onclick="loadSampleData()" class="text-xs text-blue-600 hover:text-blue-800 hover:underline">
+            โหลดข้อมูลตัวอย่างเริ่มต้น
+          </button>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs sm:text-sm">
+          <thead class="bg-slate-50 text-slate-600 border-b border-slate-200/80 uppercase font-semibold text-[11px] tracking-wider">
+            <tr>
+              <th class="py-3 px-4 w-12 text-center">ลำดับ</th>
+              <th class="py-3 px-4">ชื่อเครื่อง / หมายเลขพัสดุ</th>
+              <th class="py-3 px-4">ยี่ห้อและรุ่น</th>
+              <th class="py-3 px-4">สเปกหลัก (CPU/RAM/Drive)</th>
+              <th class="py-3 px-4">สถานที่ติดตั้ง</th>
+              <th class="py-3 px-4">เครือข่าย</th>
+              <th class="py-3 px-4">ระบบปฏิบัติการ</th>
+              <th class="py-3 px-4">ผู้รับผิดชอบ</th>
+              <th class="py-3 px-4 text-center">จัดการ</th>
+            </tr>
+          </thead>
+          <tbody id="assetTableBody" class="divide-y divide-slate-100 text-slate-700">
+            <!-- Rows injected by JavaScript -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MODAL: ADD / EDIT ASSET (WITH COMBOBOX / DATALIST FOR ALL FIELDS) -->
+  <div id="assetModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      
+      <!-- Modal Header -->
+      <div class="px-6 py-4 bg-gradient-to-r from-blue-900 to-indigo-900 text-white flex items-center justify-between shrink-0">
+        <div class="flex items-center space-x-2">
+          <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+            <svg class="w-5 h-5 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+          </div>
+          <div>
+            <h2 id="modalTitle" class="text-base font-bold">บันทึกข้อมูลเครื่องคอมพิวเตอร์</h2>
+            <p class="text-xs text-blue-200/80">กรอกข้อมูลทั้ง 26 ฟิลด์ (สามารถคลิกเลือกจากรายการ หรือพิมพ์ค่าใหม่ได้ทันที)</p>
+          </div>
+        </div>
+        <button onclick="closeModal()" class="text-blue-200 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Quick Preset Buttons -->
+      <div class="bg-blue-50/70 border-b border-blue-100 px-6 py-2.5 flex items-center gap-2 overflow-x-auto text-xs shrink-0">
+        <span class="font-medium text-blue-900 whitespace-nowrap">ตัวช่วยกรอกสเปกด่วน:</span>
+        <button type="button" onclick="applyPresetStandard()" class="px-2.5 py-1 bg-white hover:bg-blue-100 border border-blue-200 text-blue-800 rounded-md font-medium shadow-xs transition-colors whitespace-nowrap">
+          + ชุดมาตรฐานสำนักงาน ทอ. (Core i5 / RAM 16GB / Win 11 Pro)
+        </button>
+        <button type="button" onclick="applyPresetHighPerf()" class="px-2.5 py-1 bg-white hover:bg-blue-100 border border-blue-200 text-blue-800 rounded-md font-medium shadow-xs transition-colors whitespace-nowrap">
+          + ชุดประมวลผลสูง (Core i7 / RAM 32GB / SSD 1TB)
+        </button>
+      </div>
+
+      <!-- Modal Body (Form with Categories) -->
+      <form id="assetForm" onsubmit="saveAsset(event)" class="p-6 overflow-y-auto space-y-6 flex-1 text-xs sm:text-sm">
+        <input type="hidden" id="editIndex" value="-1">
+
+        <!-- CATEGORY 1: ข้อมูลครุภัณฑ์และสถานที่ -->
+        <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 space-y-4">
+          <div class="flex items-center space-x-2 border-b border-slate-200/80 pb-2">
+            <span class="w-6 h-6 rounded-md bg-blue-600 text-white flex items-center justify-center text-xs font-bold">1</span>
+            <h3 class="font-bold text-slate-800 text-sm">ข้อมูลครุภัณฑ์ ทอ. และสถานที่ติดตั้ง</h3>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-slate-600 font-medium mb-1">สถานที่ติดตั้งอุปกรณ์ <span class="text-rose-500">*</span></label>
+              <input type="text" list="list-location" id="field-location" required placeholder="เลือกหรือพิมพ์สถานที่..." class="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+            </div>
+            <div>
+              <label class="block text-slate-600 font-medium mb-1">หมายเลขพัสดุ ทอ. <span class="text-rose-500">*</span></label>
+              <input type="text" id="field-assetId" required placeholder="เช่น ทอ.7110-001-0025/67" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+            </div>
+            <div>
+              <label class="block text-slate-600 font-medium mb-1">Serial Number (S/N) <span class="text-rose-500">*</span></label>
+              <input type="text" id="field-serial" required placeholder="หมายเลขเครื่องจากผู้ผลิต" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white font-mono">
+            </div>
+            <div>
+              <label class="block text-slate-600 font-medium mb-1">คอมพิวเตอร์จากโครงการ</label>
+              <input type="text" list="list-project" id="field-project" placeholder="เลือกหรือพิมพ์โครงการ..." class="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+            </div>
+            <div>
+              <label class="block text-slate-600 font-medium mb-1">ปีที่ติดตั้ง (พ.ศ.)</label>
+              <select id="field-year" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white text-slate-700">
+                <option value="">-- เลือกปีที่ติดตั้ง (2550 - 2580) --</option>
+                <option value="2550">2550</option>
+                <option value="2551">2551</option>
+                <option value="2552">2552</option>
+                <option value="2553">2553</option>
+                <option value="2554">2554</option>
+                <option value="2555">2555</option>
+                <option value="2556">2556</option>
+                <option value="2557">2557</option>
+                <option value="2558">2558</option>
+                <option value="2559">2559</option>
+                <option value="2560">2560</option>
+                <option value="2561">2561</option>
+                <option value="2562">2562</option>
+                <option value="2563">2563</option>
+                <option value="2564">2564</option>
+                <option value="2565">2565</option>
+                <option value="2566">2566</option>
+                <option value="2567">2567</option>
+                <option value="2568">2568</option>
+                <option value="2569">2569</option>
+                <option value="2570">2570</option>
+                <option value="2571">2571</option>
+                <option value="2572">2572</option>
+                <option value="2573">2573</option>
+                <option value="2574">2574</option>
+                <option value="2575">2575</option>
+                <option value="2576">2576</option>
+                <option value="2577">2577</option>
+                <option value="2578">2578</option>
+                <option value="2579">2579</option>
+                <option value="2580">2580</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-slate-600 font-medium mb-1">ชื่อเครื่องคอมพิวเตอร์ (Computer Name) <span class="text-rose-500">*</span></label>
+              <input type="text" id="field-computerName" required placeholder="เช่น RTAF-HQ-PC01" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white font-mono uppercase">
+            </div>
+          </div>
+        </div>
+
+        <!-- CATEGORY 2: ฮาร์ดแวร์ตัวเครื่อง (Hardware Specs) -->
+        <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 space-y-4">
+          <div class="flex items-center space-x-2 border-b border-slate-200/80 pb-2">
+            <span class="w-6 h-6 rounded-md bg-indigo-600 text-white flex items-center justify-center text-xs font-bold">2</span>
+            <h3 class="font-bold text-slate-800 text-sm">ข้อมูลฮาร์ดแวร์ตัวเครื่อง (Hardware Specifications)</h3>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+            <div>
+              <label class="block text-slate-600 font-medium mb-1">ยี่ห้อของอุปกรณ์ <span class="text-rose-500">*</span></label>
+              <input type="text" list="list-brand" id="field-brand" required placeholder="เช่น Dell, HP, Lenovo" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+            </div>
+            <div>
+              <label class="block text-slate-600 font-medium mb-1">รุ่นของอุปกรณ์</label>
+              <input type="text" list="list-model" id="field-model" placeholder="เช่น OptiPlex 7010" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+            </div>
+            <div>
+              <label class="block text-slate-600 font-medium mb-1">ยี่ห้อ และรุ่น CPU <span class="text-rose-500">*</span></label>
+              <input type="text" list="list-cpu" id="field-cpu" required placeholder="เช่น Intel Core i5-12400" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+            </div>
+            <div>
+              <label class="block text-slate-600 font-medium mb-1">ความเร็วสัญญาณนาฬิกา (GHz)</label>
+              <input type="text" list="list-clock" id="field-clock" placeholder="เช่น 2.50 GHz" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+            </div>
+
+            <div>
+              <label class="block text-slate-600 font-medium mb-1">ประเภทของ RAM</label>
+              <input type="text" list="list-ramType" id="field-ramType" placeholder="เช่น DDR4, DDR5" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+            </div>
+            <div>
+              <label class="block text-slate-600 font-medium mb-1">ความจุของ RAM (GB) <span class="text-rose-500">*</span></label>
+              <input type="text" list="list-ramSize" id="field-ramSize" required placeholder="เช่น 16 GB" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+            </div>
+            <div>
+              <label class="block text-slate-600 font-medium mb-1">ประเภท Harddisk</label>
+              <input type="text" list="list-hddType" id="field-hddType" placeholder="เช่น M.2 NVMe SSD" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+            </div>
+            <div>
+              <label class="block text-slate-600 font-medium mb-1">ความจุของ Harddisk <span class="text-rose-500">*</span></label>
+              <input type="text" list="list-hddSize" id="field-hddSize" required placeholder="เช่น 512 GB SSD" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+            </div>
+          </div>
+        </div>
+
+        <!-- CATEGORY 3: เครือข่าย (Network) -->
+        <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 space-y-4">
+          <div class="flex items-center space-x-2 border-b border-slate-200/80 pb-2">
+            <span class="w-6 h-6 rounded-md bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">3</span>
+            <h3 class="font-bold text-slate-800 text-sm">การเชื่อมต่อเครือข่าย (Network Connection)</h3>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-600 font-medium mb-1">MAC Address <span class="text-rose-500">*</span></label>
+              <input type="text" id="field-mac" required placeholder="เช่น 00:1A:2B:3C:4D:5E" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white font-mono uppercase">
+            </div>
+            <div>
+              <label class="block text-slate-600 font-medium mb-1">เครือข่ายที่ใช้ <span class="text-rose-500">*</span></label>
+              <input type="text" list="list-network" id="field-network" required placeholder="เลือกประเภทเครือข่าย..." class="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+            </div>
+          </div>
+        </div>
+
+        <!-- CATEGORY 4: ซอฟต์แวร์และลิขสิทธิ์ (Software & Licenses) -->
+        <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 space-y-4">
+          <div class="flex items-center space-x-2 border-b border-slate-200/80 pb-2">
+            <span class="w-6 h-6 rounded-md bg-amber-600 text-white flex items-center justify-center text-xs font-bold">4</span>
+            <h3 class="font-bold text-slate-800 text-sm">ซอฟต์แวร์และลิขสิทธิ์ (Software & Licenses)</h3>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-600 font-medium mb-1">ชื่อระบบปฏิบัติการ (OS) <span class="text-rose-500">*</span></label>
+              <input type="text" list="list-os" id="field-os" required placeholder="เช่น Windows 11 Pro 64-bit" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+            </div>
+            <div>
+              <label class="block text-slate-600 font-medium mb-1">ลิขสิทธิ์ของระบบปฏิบัติการ</label>
+              <input type="text" list="list-osLicense" id="field-osLicense" placeholder="เช่น OEM, Volume License ทอ." class="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+            </div>
+
+            <div>
+              <label class="block text-slate-600 font-medium mb-1">ชื่อโปรแกรมสำนักงาน</label>
+              <input type="text" list="list-office" id="field-office" placeholder="เช่น Microsoft Office 2021 Pro" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+            </div>
+            <div>
+              <label class="block text-slate-600 font-medium mb-1">ลิขสิทธิ์ของโปรแกรมสำนักงาน</label>
+              <input type="text" list="list-officeLicense" id="field-officeLicense" placeholder="เช่น Volume License ทอ., Subscription" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+            </div>
+
+            <div>
+              <label class="block text-slate-600 font-medium mb-1">ชื่อโปรแกรมป้องกันไวรัส</label>
+              <input type="text" list="list-antivirus" id="field-antivirus" placeholder="เช่น Trend Micro, Windows Defender" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+            </div>
+            <div>
+              <label class="block text-slate-600 font-medium mb-1">ลิขสิทธิ์ของโปรแกรมป้องกันไวรัส</label>
+              <input type="text" list="list-antivirusLicense" id="field-antivirusLicense" placeholder="เช่น Enterprise Centralized (ทอ.)" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+            </div>
+          </div>
+        </div>
+
+        <!-- CATEGORY 5: ผู้รับผิดชอบและหมายเหตุ (Custodian & Remarks) -->
+        <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 space-y-4">
+          <div class="flex items-center space-x-2 border-b border-slate-200/80 pb-2">
+            <span class="w-6 h-6 rounded-md bg-purple-600 text-white flex items-center justify-center text-xs font-bold">5</span>
+            <h3 class="font-bold text-slate-800 text-sm">ผู้รับผิดชอบเครื่อง และสถานะ</h3>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-slate-600 font-medium mb-1">ผู้รับผิดชอบ (ยศ-ชื่อ-สกุล) <span class="text-rose-500">*</span></label>
+              <input type="text" id="field-responsible" required placeholder="เช่น น.ต.สมชาย เจริญสุข" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+            </div>
+            <div>
+              <label class="block text-slate-600 font-medium mb-1">โทรศัพท์ติดต่อผู้รับผิดชอบ <span class="text-rose-500">*</span></label>
+              <input type="text" id="field-phone" required placeholder="เช่น 081-234-5678 หรือ เบอร์ภายใน 2-4567" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+            </div>
+            <div>
+              <label class="block text-slate-600 font-medium mb-1">หมายเหตุ / สถานะ</label>
+              <input type="text" list="list-remarks" id="field-remarks" placeholder="เช่น สภาพพร้อมใช้งาน, ส่งซ่อม" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons inside Form -->
+        <div class="flex items-center justify-end space-x-3 pt-4 border-t border-slate-200">
+          <button type="button" onclick="closeModal()" class="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-100 font-medium transition-colors">
+            ยกเลิก
+          </button>
+          <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg shadow-md shadow-blue-500/20 transition-all hover:scale-[1.01]">
+            บันทึกข้อมูล
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: VIEW ASSET DETAILS (READ ONLY CARD) -->
+  <div id="detailModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] flex flex-col border border-slate-200 overflow-hidden">
+      <div class="px-6 py-4 bg-slate-800 text-white flex items-center justify-between">
+        <div>
+          <h3 id="detailModalTitle" class="text-base font-bold">รายละเอียดสินทรัพย์</h3>
+          <p id="detailModalSubtitle" class="text-xs text-slate-300">หมายเลขพัสดุ</p>
+        </div>
+        <button onclick="closeDetailModal()" class="text-slate-300 hover:text-white p-1 rounded-lg hover:bg-white/10">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div id="detailModalContent" class="p-6 overflow-y-auto space-y-4 text-xs sm:text-sm">
+        <!-- Rendered by JS -->
+      </div>
+      <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-end space-x-2">
+        <button onclick="closeDetailModal()" class="px-4 py-1.5 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-100 font-medium">ปิด</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALL PRESET DATALISTS (FOR COMBOBOX BEHAVIOR) -->
+  <datalist id="list-location">
+    <option value="ผธก.บก.บน.23">
+    <option value="ผกพ.บก.บน.23">
+    <option value="ผขว.บก.บน.23">
+    <option value="ผยก.บก.บน.23">
+    <option value="ผกบ.บก.บน.23">
+    <option value="ผกร.บก.บน.23">
+    <option value="มว.จัดหา บก.บน.23">
+    <option value="นงป.บน.23">
+    <option value="นธน.บน.23">
+    <option value="นิรภัย บน.23">
+    <option value="อศจ.บน.23">
+    <option value="ผกง.บน.23">
+    <option value="ฝูง.231 บน.23">
+    <option value="พัน.อย.บน.23">
+    <option value="ผนบ.บน.23">
+    <option value="บก.กทน.บน.23">
+    <option value="ผชอ.กทน.บน.23">
+    <option value="ผสอ.กทน.บน.23">
+    <option value="ผสพ.กทน.บน.23">
+    <option value="มว.บชพ.กทน.บน.23">
+    <option value="รพ.กองบิน บน.23">
+    <option value="ผชย.บน.23">
+    <option value="ผขส.บน.23">
+    <option value="ผพธ.บน.23">
+    <option value="ผสก.บน.23">
+    <option value="ร้อย.ทสห.บน.23">
+    <option value="ฝคก.บน.23">
+    <option value="ฝูง.236 (สกลนคร)">
+    <option value="ฝูง.238 (นครพนม)">
+    <option value="ฝคส.2 (แอมโม่)">
+    <option value="หน่วยบิน 2038">
+  </datalist>
+
+  <datalist id="list-project">
+    <option value="โครงการจัดหาระบบคอมพิวเตอร์เพื่อการพัฒนางาน ทอ. ปี 65">
+    <option value="โครงการจัดซื้อทดแทนเครื่องคอมพิวเตอร์หมดอายุ ปี 66">
+    <option value="โครงการเสริมสร้างศักยภาพสารสนเทศ ทอ. ปี 67">
+    <option value="โครงการพัฒนาระบบบัญชาการและควบคุม (C2) ทอ.">
+    <option value="งบประมาณดำเนินงานปกติของหน่วยงาน">
+    <option value="รับโอนจากหน่วยงานอื่น">
+  </datalist>
+
+  <datalist id="list-year">
+    <option value="2550">
+    <option value="2551">
+    <option value="2552">
+    <option value="2553">
+    <option value="2554">
+    <option value="2555">
+    <option value="2556">
+    <option value="2557">
+    <option value="2558">
+    <option value="2559">
+    <option value="2560">
+    <option value="2561">
+    <option value="2562">
+    <option value="2563">
+    <option value="2564">
+    <option value="2565">
+    <option value="2566">
+    <option value="2567">
+    <option value="2568">
+    <option value="2569">
+    <option value="2570">
+    <option value="2571">
+    <option value="2572">
+    <option value="2573">
+    <option value="2574">
+    <option value="2575">
+    <option value="2576">
+    <option value="2577">
+    <option value="2578">
+    <option value="2579">
+    <option value="2580">
+  </datalist>
+
+  <datalist id="list-brand">
+    <option value="Dell">
+    <option value="HP">
+    <option value="Lenovo">
+    <option value="Acer">
+    <option value="ASUS">
+    <option value="Apple">
+    <option value="Fujitsu">
+    <option value="ประกอบเอง (Custom PC)">
+  </datalist>
+
+  <datalist id="list-model">
+    <option value="Dell OptiPlex 7010">
+    <option value="Dell OptiPlex 5090">
+    <option value="Dell OptiPlex 3080">
+    <option value="HP ProDesk 400 G7">
+    <option value="HP EliteDesk 800 G6">
+    <option value="Lenovo ThinkCentre M70q">
+    <option value="Lenovo ThinkCentre M720s">
+    <option value="Acer Veriton M Series">
+    <option value="ASUS ExpertCenter D5">
+    <option value="HP ProBook 440 G8 (Notebook)">
+    <option value="Dell Latitude 3420 (Notebook)">
+  </datalist>
+
+  <datalist id="list-cpu">
+    <option value="Intel Core i3-12100">
+    <option value="Intel Core i5-10400">
+    <option value="Intel Core i5-11400">
+    <option value="Intel Core i5-12400">
+    <option value="Intel Core i5-13400">
+    <option value="Intel Core i7-11700">
+    <option value="Intel Core i7-12700">
+    <option value="Intel Core i7-13700">
+    <option value="AMD Ryzen 5 5600G">
+    <option value="AMD Ryzen 7 5700G">
+    <option value="Apple M2">
+  </datalist>
+
+  <datalist id="list-clock">
+    <option value="2.00 GHz">
+    <option value="2.50 GHz">
+    <option value="2.90 GHz">
+    <option value="3.20 GHz">
+    <option value="3.60 GHz">
+    <option value="3.90 GHz">
+    <option value="4.20 GHz">
+  </datalist>
+
+  <datalist id="list-ramType">
+    <option value="DDR4">
+    <option value="DDR5">
+    <option value="DDR3">
+    <option value="LPDDR4x (Onboard)">
+    <option value="LPDDR5 (Onboard)">
+  </datalist>
+
+  <datalist id="list-ramSize">
+    <option value="4 GB">
+    <option value="8 GB">
+    <option value="16 GB">
+    <option value="32 GB">
+    <option value="64 GB">
+  </datalist>
+
+  <datalist id="list-hddType">
+    <option value="M.2 NVMe SSD">
+    <option value="2.5\" SATA SSD">
+    <option value="3.5\" SATA HDD (7200 RPM)">
+    <option value="Hybrid (M.2 SSD + SATA HDD)">
+  </datalist>
+
+  <datalist id="list-hddSize">
+    <option value="256 GB SSD">
+    <option value="512 GB SSD">
+    <option value="1 TB SSD">
+    <option value="1 TB HDD">
+    <option value="256 GB SSD + 1 TB HDD">
+    <option value="512 GB SSD + 1 TB HDD">
+  </datalist>
+
+  <datalist id="list-network">
+    <option value="เครือข่ายภายใน ทอ. (AirNet / RTAF Intranet)">
+    <option value="เครือข่ายภายนอก ทอ. (Internet สาธารณะ)">
+    <option value="ใช้งานทั้ง 2 เครือข่าย (Dual LAN)">
+    <option value="ไม่เชื่อมต่อเครือข่าย (Standalone / Air-gapped)">
+  </datalist>
+
+  <datalist id="list-os">
+    <option value="Windows 11 Pro 64-bit">
+    <option value="Windows 10 Pro 64-bit">
+    <option value="Windows 11 Home 64-bit">
+    <option value="Windows 10 Enterprise">
+    <option value="Ubuntu Linux Desktop 22.04 LTS">
+    <option value="Ubuntu Linux Desktop 24.04 LTS">
+    <option value="macOS Sonoma">
+  </datalist>
+
+  <datalist id="list-osLicense">
+    <option value="OEM (ติดมากับเครื่อง)">
+    <option value="Volume License (KMS / MAK ทอ.)">
+    <option value="FPP (กล่องสิทธิ์แท้)">
+    <option value="Open Source (GPL)">
+  </datalist>
+
+  <datalist id="list-office">
+    <option value="Microsoft Office 2021 Professional Plus">
+    <option value="Microsoft Office 2019 Professional">
+    <option value="Microsoft 365 Apps for Enterprise">
+    <option value="LibreOffice 24.x">
+    <option value="WPS Office Enterprise">
+    <option value="ไม่ได้ติดตั้ง">
+  </datalist>
+
+  <datalist id="list-officeLicense">
+    <option value="Volume License (สัญญา ทอ.)">
+    <option value="Subscription (M365 รายปี)">
+    <option value="Retail / FPP">
+    <option value="Open Source / ฟรีแวร์">
+    <option value="ไม่มีลิขสิทธิ์ / ทดลองใช้งาน">
+  </datalist>
+
+  <datalist id="list-antivirus">
+    <option value="Windows Defender / Microsoft Defender">
+    <option value="Trend Micro Apex One">
+    <option value="Kaspersky Endpoint Security">
+    <option value="ESET Endpoint Security">
+    <option value="Symantec Endpoint Protection">
+    <option value="ไม่ได้ติดตั้ง">
+  </datalist>
+
+  <datalist id="list-antivirusLicense">
+    <option value="Enterprise Centralized License (ทอ.)">
+    <option value="Standalone License (รายปี)">
+    <option value="ฟรีไลเซนส์ / ติดมากับระบบปฏิบัติการ">
+    <option value="หมดอายุการคุ้มครอง">
+  </datalist>
+
+  <datalist id="list-remarks">
+    <option value="สภาพพร้อมใช้งานปกติ">
+    <option value="อยู่ระหว่างส่งซ่อมภายนอก">
+    <option value="อยู่ระหว่างรออะไหล่ทดแทน">
+    <option value="เครื่องสำรองฉุกเฉิน (Standby)">
+    <option value="รอจำหน่าย / ปลดประจำการ">
+  </datalist>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // Storage Key
+    const STORAGE_KEY = 'RTAF_WING23_IT_ASSETS_V2';
+
+    // Mock initial data for Wing 23 (กองบิน 23)
+    const INITIAL_DATA = [
+      {
+        location: "ผธก.บก.บน.23",
+        computerName: "W23-HQ-ADMIN01",
+        assetId: "ทอ.7110-001-0014/66",
+        serial: "CN-03D811-70163",
+        brand: "Dell",
+        model: "Dell OptiPlex 7010",
+        cpu: "Intel Core i7-13700",
+        clock: "2.10 GHz",
+        mac: "B4:45:06:8A:21:4B",
+        network: "เครือข่ายภายใน ทอ. (AirNet / RTAF Intranet)",
+        ramType: "DDR5",
+        ramSize: "32 GB",
+        hddType: "M.2 NVMe SSD",
+        hddSize: "1 TB SSD",
+        os: "Windows 11 Pro 64-bit",
+        osLicense: "OEM (ติดมากับเครื่อง)",
+        office: "Microsoft 365 Apps for Enterprise",
+        officeLicense: "Subscription (M365 รายปี)",
+        antivirus: "Trend Micro Apex One",
+        antivirusLicense: "Enterprise Centralized License (ทอ.)",
+        project: "โครงการเสริมสร้างศักยภาพสารสนเทศ ทอ. ปี 67",
+        year: "2567",
+        responsible: "น.ต.กิตติพงศ์ เจริญกิจ",
+        phone: "4-2112",
+        remarks: "สภาพพร้อมใช้งานปกติ"
+      },
+      {
+        location: "ผสอ.กทน.บน.23",
+        computerName: "W23-COMM-WS05",
+        assetId: "ทอ.7110-002-0089/65",
+        serial: "HP-8CG21447XY",
+        brand: "HP",
+        model: "HP ProDesk 400 G7",
+        cpu: "Intel Core i5-10400",
+        clock: "2.90 GHz",
+        mac: "A0:29:42:C1:55:12",
+        network: "เครือข่ายภายใน ทอ. (AirNet / RTAF Intranet)",
+        ramType: "DDR4",
+        ramSize: "16 GB",
+        hddType: "M.2 NVMe SSD",
+        hddSize: "512 GB SSD",
+        os: "Windows 10 Pro 64-bit",
+        osLicense: "Volume License (KMS / MAK ทอ.)",
+        office: "Microsoft Office 2021 Professional Plus",
+        officeLicense: "Volume License (สัญญา ทอ.)",
+        antivirus: "Trend Micro Apex One",
+        antivirusLicense: "Enterprise Centralized License (ทอ.)",
+        project: "โครงการจัดหาระบบคอมพิวเตอร์เพื่อการพัฒนางาน ทอ. ปี 65",
+        year: "2565",
+        responsible: "ร.อ.อนุชิต ชัยชนะ",
+        phone: "4-2315",
+        remarks: "สภาพพร้อมใช้งานปกติ"
+      },
+      {
+        location: "ฝูง.231 บน.23",
+        computerName: "SQ231-OPS-PC02",
+        assetId: "ทอ.7110-001-0102/66",
+        serial: "MJ08KLP4",
+        brand: "Lenovo",
+        model: "Lenovo ThinkCentre M70q",
+        cpu: "Intel Core i5-12400",
+        clock: "2.50 GHz",
+        mac: "38:F9:D3:52:90:7E",
+        network: "เครือข่ายภายใน ทอ. (AirNet / RTAF Intranet)",
+        ramType: "DDR4",
+        ramSize: "16 GB",
+        hddType: "M.2 NVMe SSD",
+        hddSize: "512 GB SSD",
+        os: "Windows 11 Pro 64-bit",
+        osLicense: "OEM (ติดมากับเครื่อง)",
+        office: "Microsoft Office 2021 Professional Plus",
+        officeLicense: "Volume License (สัญญา ทอ.)",
+        antivirus: "Trend Micro Apex One",
+        antivirusLicense: "Enterprise Centralized License (ทอ.)",
+        project: "โครงการจัดซื้อทดแทนเครื่องคอมพิวเตอร์หมดอายุ ปี 66",
+        year: "2566",
+        responsible: "น.ท.ธีรเดช เกียรติก้อง",
+        phone: "4-2231",
+        remarks: "สภาพพร้อมใช้งานปกติ"
+      },
+      {
+        location: "รพ.กองบิน บน.23",
+        computerName: "W23-MED-REG01",
+        assetId: "ทอ.7110-003-0044/67",
+        serial: "DL-908B172",
+        brand: "Dell",
+        model: "Dell OptiPlex 7010",
+        cpu: "Intel Core i5-12400",
+        clock: "2.50 GHz",
+        mac: "E4:54:E8:22:11:AB",
+        network: "เครือข่ายภายนอก ทอ. (Internet สาธารณะ)",
+        ramType: "DDR4",
+        ramSize: "16 GB",
+        hddType: "2.5\" SATA SSD",
+        hddSize: "512 GB SSD",
+        os: "Windows 11 Pro 64-bit",
+        osLicense: "OEM (ติดมากับเครื่อง)",
+        office: "Microsoft Office 2019 Professional",
+        officeLicense: "Volume License (สัญญา ทอ.)",
+        antivirus: "Windows Defender / Microsoft Defender",
+        antivirusLicense: "ฟรีไลเซนส์ / ติดมากับระบบปฏิบัติการ",
+        project: "โครงการเสริมสร้างศักยภาพสารสนเทศ ทอ. ปี 67",
+        year: "2567",
+        responsible: "พ.อ.อ.หญิง สุนิสา รักษ์ดี",
+        phone: "4-2450",
+        remarks: "เครื่องจุดรับลงทะเบียนผู้ป่วย"
+      },
+      {
+        location: "หน่วยบิน 2038",
+        computerName: "W23-FLIGHT-2038",
+        assetId: "ทอ.7110-001-0155/67",
+        serial: "HP-9LK8812X",
+        brand: "HP",
+        model: "HP EliteDesk 800 G6",
+        cpu: "Intel Core i7-12700",
+        clock: "2.10 GHz",
+        mac: "D2:11:4F:9C:33:6A",
+        network: "ไม่เชื่อมต่อเครือข่าย (Standalone / Air-gapped)",
+        ramType: "DDR5",
+        ramSize: "32 GB",
+        hddType: "M.2 NVMe SSD",
+        hddSize: "1 TB SSD",
+        os: "Windows 11 Pro 64-bit",
+        osLicense: "OEM (ติดมากับเครื่อง)",
+        office: "Microsoft Office 2021 Professional Plus",
+        officeLicense: "Volume License (สัญญา ทอ.)",
+        antivirus: "Kaspersky Endpoint Security",
+        antivirusLicense: "Enterprise Centralized License (ทอ.)",
+        project: "โครงการพัฒนาระบบบัญชาการและควบคุม (C2) ทอ.",
+        year: "2567",
+        responsible: "ร.อ.พัฒนะ สุขเกษม",
+        phone: "081-998-7766",
+        remarks: "เครื่องวางแผนการบิน Standalone"
+      }
+    ];
+
+    let assets = [];
+
+    // Initialize
+    function init() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          assets = JSON.parse(saved);
+        } catch (e) {
+          assets = [...INITIAL_DATA];
+        }
+      } else {
+        assets = [...INITIAL_DATA];
+        saveToLocalStorage();
+      }
+      populateFilterDropdowns();
+      renderTable();
+      updateStats();
+    }
+
+    function saveToLocalStorage() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(assets));
+    }
+
+    function loadSampleData() {
+      if (confirm("ต้องการโหลดข้อมูลตัวอย่างกลับคืนมาใช่หรือไม่?")) {
+        assets = [...INITIAL_DATA];
+        saveToLocalStorage();
+        populateFilterDropdowns();
+        renderTable();
+        updateStats();
+      }
+    }
+
+    function populateFilterDropdowns() {
+      const locSelect = document.getElementById('filterLocation');
+      const brandSelect = document.getElementById('filterBrand');
+      const yearSelect = document.getElementById('filterYear');
+
+      const locations = Array.from(new Set(assets.map(a => a.location).filter(Boolean)));
+      const brands = Array.from(new Set(assets.map(a => a.brand).filter(Boolean)));
+      const years = Array.from(new Set(assets.map(a => a.year).filter(Boolean))).sort();
+
+      locSelect.innerHTML = '<option value="">ทุกสถานที่ติดตั้ง</option>' + locations.map(l => `<option value="${l}">${l}</option>`).join('');
+      brandSelect.innerHTML = '<option value="">ทุกยี่ห้อ</option>' + brands.map(b => `<option value="${b}">${b}</option>`).join('');
+      yearSelect.innerHTML = '<option value="">ทุกปีที่ติดตั้ง</option>' + years.map(y => `<option value="${y}">ปี พ.ศ. ${y}</option>`).join('');
+    }
+
+    function updateStats() {
+      document.getElementById('stat-total').innerText = assets.length;
+      document.getElementById('stat-internal').innerText = assets.filter(a => a.network && a.network.includes('ภายใน')).length;
+      document.getElementById('stat-win11').innerText = assets.filter(a => a.os && a.os.includes('Windows 11')).length;
+      document.getElementById('stat-av').innerText = assets.filter(a => a.antivirus && !a.antivirus.includes('ไม่ได้ติดตั้ง')).length;
+    }
+
+    function renderTable(filteredAssets = null) {
+      const dataToRender = filteredAssets || assets;
+      const tbody = document.getElementById('assetTableBody');
+      const countEl = document.getElementById('recordCount');
+      countEl.innerText = `${dataToRender.length} รายการ`;
+
+      if (dataToRender.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="9" class="py-10 text-center text-slate-400">
+              <svg class="w-10 h-10 mx-auto text-slate-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              ไม่พบข้อมูลเครื่องคอมพิวเตอร์ที่ค้นหา
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = dataToRender.map((item, idx) => {
+        const originalIndex = assets.indexOf(item);
+        const isInternal = item.network && item.network.includes('ภายใน');
+        const networkBadge = isInternal
+          ? '<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-indigo-50 text-indigo-700 border border-indigo-200">ใน ทอ.</span>'
+          : '<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200">นอก ทอ.</span>';
+
+        return `
+          <tr class="hover:bg-blue-50/40 transition-colors group">
+            <td class="py-3 px-4 text-center font-medium text-slate-400">${idx + 1}</td>
+            <td class="py-3 px-4">
+              <div class="font-semibold text-slate-800 font-mono text-xs sm:text-sm text-blue-600 cursor-pointer hover:underline" onclick="viewDetail(${originalIndex})">${escapeHtml(item.computerName || '-')}</div>
+              <div class="text-[11px] text-slate-500 font-medium">${escapeHtml(item.assetId || '-')}</div>
+            </td>
+            <td class="py-3 px-4">
+              <div class="font-medium text-slate-800">${escapeHtml(item.brand || '-')}</div>
+              <div class="text-[11px] text-slate-500">${escapeHtml(item.model || '-')}</div>
+            </td>
+            <td class="py-3 px-4">
+              <div class="text-xs text-slate-700 font-medium">${escapeHtml(item.cpu || '-')}</div>
+              <div class="text-[11px] text-slate-500">${escapeHtml(item.ramSize || '')} • ${escapeHtml(item.hddSize || '')}</div>
+            </td>
+            <td class="py-3 px-4 text-xs max-w-[180px] truncate" title="${escapeHtml(item.location || '')}">
+              ${escapeHtml(item.location || '-')}
+            </td>
+            <td class="py-3 px-4">
+              ${networkBadge}
+            </td>
+            <td class="py-3 px-4 text-xs">
+              <span class="font-medium text-slate-700">${escapeHtml(item.os || '-')}</span>
+              <div class="text-[10px] text-slate-400">${escapeHtml(item.osLicense || '')}</div>
+            </td>
+            <td class="py-3 px-4 text-xs">
+              <div class="font-medium text-slate-800">${escapeHtml(item.responsible || '-')}</div>
+              <div class="text-[11px] text-slate-400 font-mono">${escapeHtml(item.phone || '-')}</div>
+            </td>
+            <td class="py-3 px-4 text-center">
+              <div class="flex items-center justify-center space-x-1">
+                <button onclick="viewDetail(${originalIndex})" title="ดูรายละเอียดทั้งหมด" class="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                </button>
+                <button onclick="editAsset(${originalIndex})" title="แก้ไข" class="p-1.5 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                </button>
+                <button onclick="deleteAsset(${originalIndex})" title="ลบรายการ" class="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function applyFilters() {
+      const query = document.getElementById('searchInput').value.trim().toLowerCase();
+      const loc = document.getElementById('filterLocation').value;
+      const net = document.getElementById('filterNetwork').value;
+      const brand = document.getElementById('filterBrand').value;
+      const year = document.getElementById('filterYear').value;
+
+      const filtered = assets.filter(item => {
+        const matchesQuery = !query || [
+          item.computerName,
+          item.assetId,
+          item.serial,
+          item.responsible,
+          item.location,
+          item.brand,
+          item.model,
+          item.year
+        ].some(val => val && val.toLowerCase().includes(query));
+
+        const matchesLoc = !loc || item.location === loc;
+        const matchesNet = !net || (item.network && item.network.includes(net));
+        const matchesBrand = !brand || item.brand === brand;
+        const matchesYear = !year || item.year === year;
+
+        return matchesQuery && matchesLoc && matchesNet && matchesBrand && matchesYear;
+      });
+
+      renderTable(filtered);
+    }
+
+    function resetFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('filterLocation').value = '';
+      document.getElementById('filterNetwork').value = '';
+      document.getElementById('filterBrand').value = '';
+      document.getElementById('filterYear').value = '';
+      renderTable();
+    }
+
+    // Modal Operations
+    function openModal(editIndex = -1) {
+      document.getElementById('editIndex').value = editIndex;
+      const modal = document.getElementById('assetModal');
+      const title = document.getElementById('modalTitle');
+
+      if (editIndex >= 0) {
+        title.innerText = "แก้ไขข้อมูลคอมพิวเตอร์";
+        const a = assets[editIndex];
+        document.getElementById('field-location').value = a.location || '';
+        document.getElementById('field-computerName').value = a.computerName || '';
+        document.getElementById('field-assetId').value = a.assetId || '';
+        document.getElementById('field-serial').value = a.serial || '';
+        document.getElementById('field-brand').value = a.brand || '';
+        document.getElementById('field-model').value = a.model || '';
+        document.getElementById('field-cpu').value = a.cpu || '';
+        document.getElementById('field-clock').value = a.clock || '';
+        document.getElementById('field-mac').value = a.mac || '';
+        document.getElementById('field-network').value = a.network || '';
+        document.getElementById('field-ramType').value = a.ramType || '';
+        document.getElementById('field-ramSize').value = a.ramSize || '';
+        document.getElementById('field-hddType').value = a.hddType || '';
+        document.getElementById('field-hddSize').value = a.hddSize || '';
+        document.getElementById('field-os').value = a.os || '';
+        document.getElementById('field-osLicense').value = a.osLicense || '';
+        document.getElementById('field-office').value = a.office || '';
+        document.getElementById('field-officeLicense').value = a.officeLicense || '';
+        document.getElementById('field-antivirus').value = a.antivirus || '';
+        document.getElementById('field-antivirusLicense').value = a.antivirusLicense || '';
+        document.getElementById('field-project').value = a.project || '';
+        document.getElementById('field-year').value = a.year || '';
+        document.getElementById('field-responsible').value = a.responsible || '';
+        document.getElementById('field-phone').value = a.phone || '';
+        document.getElementById('field-remarks').value = a.remarks || '';
+      } else {
+        title.innerText = "บันทึกข้อมูลเครื่องคอมพิวเตอร์ใหม่";
+        document.getElementById('assetForm').reset();
+        document.getElementById('field-year').value = "";
+        document.getElementById('field-remarks').value = "สภาพพร้อมใช้งานปกติ";
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('assetModal').classList.add('hidden');
+    }
+
+    function editAsset(index) {
+      openModal(index);
+    }
+
+    function deleteAsset(index) {
+      const a = assets[index];
+      if (confirm(`ยืนยันการลบเครื่อง "${a.computerName || a.assetId}" ออกจากระบบ?`)) {
+        assets.splice(index, 1);
+        saveToLocalStorage();
+        populateFilterDropdowns();
+        applyFilters();
+        updateStats();
+      }
+    }
+
+    function saveAsset(e) {
+      e.preventDefault();
+      const editIndex = parseInt(document.getElementById('editIndex').value, 10);
+
+      const assetData = {
+        location: document.getElementById('field-location').value.trim(),
+        computerName: document.getElementById('field-computerName').value.trim(),
+        assetId: document.getElementById('field-assetId').value.trim(),
+        serial: document.getElementById('field-serial').value.trim(),
+        brand: document.getElementById('field-brand').value.trim(),
+        model: document.getElementById('field-model').value.trim(),
+        cpu: document.getElementById('field-cpu').value.trim(),
+        clock: document.getElementById('field-clock').value.trim(),
+        mac: document.getElementById('field-mac').value.trim().toUpperCase(),
+        network: document.getElementById('field-network').value.trim(),
+        ramType: document.getElementById('field-ramType').value.trim(),
+        ramSize: document.getElementById('field-ramSize').value.trim(),
+        hddType: document.getElementById('field-hddType').value.trim(),
+        hddSize: document.getElementById('field-hddSize').value.trim(),
+        os: document.getElementById('field-os').value.trim(),
+        osLicense: document.getElementById('field-osLicense').value.trim(),
+        office: document.getElementById('field-office').value.trim(),
+        officeLicense: document.getElementById('field-officeLicense').value.trim(),
+        antivirus: document.getElementById('field-antivirus').value.trim(),
+        antivirusLicense: document.getElementById('field-antivirusLicense').value.trim(),
+        project: document.getElementById('field-project').value.trim(),
+        year: document.getElementById('field-year').value.trim(),
+        responsible: document.getElementById('field-responsible').value.trim(),
+        phone: document.getElementById('field-phone').value.trim(),
+        remarks: document.getElementById('field-remarks').value.trim()
+      };
+
+      if (editIndex >= 0) {
+        assets[editIndex] = assetData;
+      } else {
+        assets.unshift(assetData);
+      }
+
+      saveToLocalStorage();
+      populateFilterDropdowns();
+      applyFilters();
+      updateStats();
+      closeModal();
+    }
+
+    // Quick Form Presets
+    function applyPresetStandard() {
+      document.getElementById('field-brand').value = "Dell";
+      document.getElementById('field-model').value = "Dell OptiPlex 7010";
+      document.getElementById('field-cpu').value = "Intel Core i5-12400";
+      document.getElementById('field-clock').value = "2.50 GHz";
+      document.getElementById('field-ramType').value = "DDR4";
+      document.getElementById('field-ramSize').value = "16 GB";
+      document.getElementById('field-hddType').value = "M.2 NVMe SSD";
+      document.getElementById('field-hddSize').value = "512 GB SSD";
+      document.getElementById('field-os').value = "Windows 11 Pro 64-bit";
+      document.getElementById('field-osLicense').value = "OEM (ติดมากับเครื่อง)";
+      document.getElementById('field-office').value = "Microsoft Office 2021 Professional Plus";
+      document.getElementById('field-officeLicense').value = "Volume License (สัญญา ทอ.)";
+      document.getElementById('field-antivirus').value = "Trend Micro Apex One";
+      document.getElementById('field-antivirusLicense').value = "Enterprise Centralized License (ทอ.)";
+      document.getElementById('field-network').value = "เครือข่ายภายใน ทอ. (AirNet / RTAF Intranet)";
+    }
+
+    function applyPresetHighPerf() {
+      document.getElementById('field-brand').value = "HP";
+      document.getElementById('field-model').value = "HP EliteDesk 800 G6";
+      document.getElementById('field-cpu').value = "Intel Core i7-13700";
+      document.getElementById('field-clock').value = "2.10 GHz";
+      document.getElementById('field-ramType').value = "DDR5";
+      document.getElementById('field-ramSize').value = "32 GB";
+      document.getElementById('field-hddType').value = "M.2 NVMe SSD";
+      document.getElementById('field-hddSize').value = "1 TB SSD";
+      document.getElementById('field-os').value = "Windows 11 Pro 64-bit";
+      document.getElementById('field-osLicense').value = "OEM (ติดมากับเครื่อง)";
+      document.getElementById('field-office').value = "Microsoft 365 Apps for Enterprise";
+      document.getElementById('field-officeLicense').value = "Subscription (M365 รายปี)";
+      document.getElementById('field-antivirus').value = "Trend Micro Apex One";
+      document.getElementById('field-antivirusLicense').value = "Enterprise Centralized License (ทอ.)";
+      document.getElementById('field-network').value = "เครือข่ายภายใน ทอ. (AirNet / RTAF Intranet)";
+    }
+
+    // View Details Modal
+    function viewDetail(index) {
+      const a = assets[index];
+      if (!a) return;
+
+      document.getElementById('detailModalTitle').innerText = `${a.computerName || 'ไม่ระบุชื่อเครื่อง'} (${a.brand || ''} ${a.model || ''})`;
+      document.getElementById('detailModalSubtitle').innerText = `หมายเลขพัสดุ: ${a.assetId || '-'} | Serial No: ${a.serial || '-'}`;
+
+      const fieldsConfig = [
+        { title: "ข้อมูลทั่วไปและสถานที่", fields: [
+          { label: "สถานที่ติดตั้งอุปกรณ์", val: a.location },
+          { label: "หมายเลขพัสดุ ทอ.", val: a.assetId },
+          { label: "Serial Number", val: a.serial },
+          { label: "ปีที่ติดตั้ง", val: a.year },
+          { label: "คอมพิวเตอร์จากโครงการ", val: a.project }
+        ]},
+        { title: "คุณลักษณะฮาร์ดแวร์", fields: [
+          { label: "ชื่อเครื่องคอมพิวเตอร์", val: a.computerName },
+          { label: "ยี่ห้อ / รุ่น", val: `${a.brand || '-'} / ${a.model || '-'}` },
+          { label: "CPU", val: `${a.cpu || '-'} (${a.clock || '-'})` },
+          { label: "หน่วยความจำ (RAM)", val: `${a.ramType || ''} ${a.ramSize || '-'}` },
+          { label: "ที่จัดเก็บข้อมูล (Harddisk)", val: `${a.hddType || ''} ${a.hddSize || '-'}` }
+        ]},
+        { title: "เครือข่ายและระบบ", fields: [
+          { label: "MAC Address", val: a.mac },
+          { label: "เครือข่ายที่ใช้", val: a.network }
+        ]},
+        { title: "ซอฟต์แวร์และลิขสิทธิ์", fields: [
+          { label: "ระบบปฏิบัติการ (OS)", val: `${a.os || '-'} [${a.osLicense || '-'}]` },
+          { label: "โปรแกรมสำนักงาน", val: `${a.office || '-'} [${a.officeLicense || '-'}]` },
+          { label: "โปรแกรมป้องกันไวรัส", val: `${a.antivirus || '-'} [${a.antivirusLicense || '-'}]` }
+        ]},
+        { title: "ผู้รับผิดชอบและสถานะ", fields: [
+          { label: "ผู้รับผิดชอบ", val: a.responsible },
+          { label: "โทรศัพท์ติดต่อ", val: a.phone },
+          { label: "หมายเหตุ / สถานะ", val: a.remarks }
+        ]}
+      ];
+
+      const html = fieldsConfig.map(sec => `
+        <div class="border border-slate-200 rounded-xl p-3.5 bg-slate-50/60">
+          <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider mb-2 border-b border-slate-200 pb-1.5 text-blue-800">${sec.title}</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+            ${sec.fields.map(f => `
+              <div class="flex flex-col">
+                <span class="text-slate-400 font-medium">${f.label}:</span>
+                <span class="font-semibold text-slate-800 break-words">${escapeHtml(f.val || '-')}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+
+      document.getElementById('detailModalContent').innerHTML = html;
+      document.getElementById('detailModal').classList.remove('hidden');
+    }
+
+    function closeDetailModal() {
+      document.getElementById('detailModal').classList.add('hidden');
+    }
+
+    // Export to exact 26-column CSV
+    function exportToCSV() {
+      if (assets.length === 0) {
+        alert("ไม่มีข้อมูลที่จะส่งออก");
+        return;
+      }
+
+      const headers = [
+        "ลำดับ",
+        "สถานที่ติดตั้งอุปกรณ์",
+        "ชื่อเครื่องคอมพิวเตอร์ (Computer Name)",
+        "หมายเลขพัสดุ ทอ.",
+        "Serial number",
+        "ยี่ห้อของอุปกรณ์",
+        "รุ่นของอุปกรณ์",
+        "ยี่ห้อ และรุ่น CPU",
+        "ความเร็วสัญญาณนาฬิกา (หน่วยระบุเป็น GHz)",
+        "MAC Address",
+        "เครื่องข่ายที่ใช้ (ภายใน ทอ./ภายนอก ทอ.)",
+        "ประเภทของ RAM",
+        "ความจุของ RAM (GB)",
+        "ประเภท Harddisk",
+        "ความจุของ Harddisk",
+        "ชื่อระบบปฏิบัติการ",
+        "ลิขสิทธิ์ของระบบปฏิบัติการ",
+        "ชื่อโปรแกรมสำนักงาน",
+        "ลิขสิทธิ์ของโปรแกรมสำนักงาน",
+        "ชื่อโปรแกรมป้องกันไวรัส",
+        "ลิขสิทธิ์ของโปรแกรมป้องกันไวรัส",
+        "คอมพิวเตอร์จากโครงการ",
+        "ปีที่ติดตั้ง",
+        "ผู้รับผิดชอบ",
+        "โทรศัพท์ติดต่อผู้ที่รับผิดชอบเครื่อง ",
+        "หมายเหตุ"
+      ];
+
+      const rows = assets.map((a, idx) => [
+        idx + 1,
+        `"${(a.location || '').replace(/"/g, '""')}"`,
+        `"${(a.computerName || '').replace(/"/g, '""')}"`,
+        `"${(a.assetId || '').replace(/"/g, '""')}"`,
+        `"${(a.serial || '').replace(/"/g, '""')}"`,
+        `"${(a.brand || '').replace(/"/g, '""')}"`,
+        `"${(a.model || '').replace(/"/g, '""')}"`,
+        `"${(a.cpu || '').replace(/"/g, '""')}"`,
+        `"${(a.clock || '').replace(/"/g, '""')}"`,
+        `"${(a.mac || '').replace(/"/g, '""')}"`,
+        `"${(a.network || '').replace(/"/g, '""')}"`,
+        `"${(a.ramType || '').replace(/"/g, '""')}"`,
+        `"${(a.ramSize || '').replace(/"/g, '""')}"`,
+        `"${(a.hddType || '').replace(/"/g, '""')}"`,
+        `"${(a.hddSize || '').replace(/"/g, '""')}"`,
+        `"${(a.os || '').replace(/"/g, '""')}"`,
+        `"${(a.osLicense || '').replace(/"/g, '""')}"`,
+        `"${(a.office || '').replace(/"/g, '""')}"`,
+        `"${(a.officeLicense || '').replace(/"/g, '""')}"`,
+        `"${(a.antivirus || '').replace(/"/g, '""')}"`,
+        `"${(a.antivirusLicense || '').replace(/"/g, '""')}"`,
+        `"${(a.project || '').replace(/"/g, '""')}"`,
+        `"${(a.year || '').replace(/"/g, '""')}"`,
+        `"${(a.responsible || '').replace(/"/g, '""')}"`,
+        `"${(a.phone || '').replace(/"/g, '""')}"`,
+        `"${(a.remarks || '').replace(/"/g, '""')}"`
+      ]);
+
+      // Add UTF-8 BOM so Excel opens Thai characters without garbling
+      const csvContent = "\uFEFF" + [headers.join(','), ...rows.map(e => e.join(','))].join('\r\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `RTAF_IT_Asset_Report_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // Run on mount
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
