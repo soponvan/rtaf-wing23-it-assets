@@ -1074,9 +1074,12 @@
       }
     }
 
+    const DEFAULT_CLOUD_URL = 'https://kvdb.io/PgwNEeAMSbtLh816zgqgk2/assets';
+
     function getCloudDbUrl() {
-      let url = localStorage.getItem('RTAF_CLOUD_DB_URL') || '';
-      if (!url) return '';
+      const customUrl = localStorage.getItem('RTAF_CLOUD_DB_URL');
+      if (customUrl === 'OFFLINE') return '';
+      let url = customUrl || DEFAULT_CLOUD_URL;
       url = url.trim().replace(/\/+$/, '');
       if (url.includes('firebaseio.com') || url.includes('firebasedatabase.app')) {
         if (!url.endsWith('.json')) {
@@ -1091,8 +1094,9 @@
       if (!cloudUrl || isCloudSyncing) return;
       try {
         isCloudSyncing = true;
+        const method = (cloudUrl.includes('firebaseio.com') || cloudUrl.includes('firebasedatabase.app')) ? 'PUT' : 'POST';
         await fetch(cloudUrl, {
-          method: 'PUT',
+          method: method,
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(assets)
         });
@@ -1109,9 +1113,13 @@
       try {
         const res = await fetch(cloudUrl, { method: 'GET', cache: 'no-cache' });
         if (res.ok) {
-          const remoteData = await res.json();
-          if (Array.isArray(remoteData) && remoteData.length > 0) {
-            // Check if remote data differs from current
+          let remoteData = await res.json();
+          // Support Firebase object with numeric keys
+          if (remoteData && typeof remoteData === 'object' && !Array.isArray(remoteData)) {
+            remoteData = Object.values(remoteData);
+          }
+          if (Array.isArray(remoteData)) {
+            // Check if remote data differs from current (e.g. deletions or additions)
             const localStr = JSON.stringify(assets);
             const remoteStr = JSON.stringify(remoteData);
             if (localStr !== remoteStr) {
@@ -1132,8 +1140,8 @@
 
     // Cloud Modal Handlers
     function openCloudModal() {
-      const rawUrl = localStorage.getItem('RTAF_CLOUD_DB_URL') || '';
-      document.getElementById('cloudDbUrlInput').value = rawUrl;
+      const rawUrl = localStorage.getItem('RTAF_CLOUD_DB_URL') || DEFAULT_CLOUD_URL;
+      document.getElementById('cloudDbUrlInput').value = (rawUrl === 'OFFLINE') ? '' : rawUrl;
       document.getElementById('cloudModal').classList.remove('hidden');
     }
 
@@ -1178,7 +1186,7 @@
 
     function disconnectCloudDb() {
       if (confirm('ต้องการยกเลิกการเชื่อมต่อคลาวด์ แล้วกลับมาใช้งานแบบออฟไลน์ในเครื่องใช่หรือไม่?')) {
-        localStorage.removeItem('RTAF_CLOUD_DB_URL');
+        localStorage.setItem('RTAF_CLOUD_DB_URL', 'OFFLINE');
         setupCloudSync();
         closeCloudModal();
       }
@@ -1510,12 +1518,14 @@
 
     function deleteAsset(index) {
       const a = assets[index];
-      if (confirm(`ยืนยันการลบเครื่อง "${a.computerName || a.assetId}" ออกจากระบบ?`)) {
+      if (!a) return;
+      if (confirm(`ยืนยันการลบเครื่อง "${a.computerName || a.assetId}" ออกจากระบบใช่หรือไม่?\n(ข้อมูลจะถูกลบออกจากฐานข้อมูลออนไลน์เรียลไทม์ทันที)`)) {
         assets.splice(index, 1);
         saveToLocalStorage();
         populateFilterDropdowns();
         applyFilters();
         updateStats();
+        updateSyncBadgeUI(new Date().toLocaleTimeString('th-TH'), 'ลบข้อมูลเรียลไทม์แล้ว');
       }
     }
 
