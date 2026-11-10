@@ -56,6 +56,12 @@
           <span id="lastSavedTime" class="text-[10px] text-emerald-400/80 font-mono"></span>
         </div>
 
+        <!-- Secret Key / Admin Access Badge -->
+        <button id="adminAuthBtn" onclick="openSecretKeyModal()" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-amber-500/20 text-amber-200 border border-amber-400/40 hover:bg-amber-500/30 shadow transition-all" title="คลิกเพื่อจัดการสิทธิ์ Secret Key ควบคุมฐานข้อมูล">
+          <svg id="adminLockIcon" class="w-3.5 h-3.5 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          <span id="adminRoleText">สิทธิ์: ทั่วไป (อ่านอย่างเดียว)</span>
+        </button>
+
         <!-- Cloud Sync Button -->
         <button onclick="openCloudModal()" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-indigo-700 hover:bg-indigo-600 text-white shadow transition-colors" title="เชื่อมต่อฐานข้อมูลกลางออนไลน์ (Firebase / Cloud Real-time)">
           <svg class="w-3.5 h-3.5 text-indigo-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 00-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
@@ -482,7 +488,16 @@
         <div>
           <label class="block text-slate-700 font-semibold mb-1">URL ฐานข้อมูล Real-time (Firebase Database URL / REST API):</label>
           <input type="url" id="cloudDbUrlInput" placeholder="เช่น https://my-project-default-rtdb.asia-southeast1.firebasedatabase.app" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-xs font-mono">
-          <p class="text-[11px] text-slate-500 mt-1">รองรับ Google Firebase Realtime Database (ฟรี 100% ไม่มีค่าใช้จ่าย)</p>
+          <p class="text-[11px] text-slate-500 mt-1">รองรับ Google Firebase Realtime Database หรือ REST API Cloud</p>
+        </div>
+
+        <div>
+          <label class="block text-slate-700 font-semibold mb-1">Database Secret Key (คีย์ควบคุมสิทธิ์ระดับฐานข้อมูล):</label>
+          <div class="relative">
+            <input type="password" id="cloudDbSecretInput" placeholder="ใส่ Secret Key ประจำฐานข้อมูลสำหรับควบคุมสิทธิ์ Write/Delete" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-xs font-mono pr-10">
+            <button type="button" onclick="togglePasswordVisibility('cloudDbSecretInput')" class="absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 text-xs">👁️</button>
+          </div>
+          <p class="text-[11px] text-slate-500 mt-1">ใช้ส่งพ่วงไปกับ Request (Authorization Header หรือ ?auth=...) เพื่อให้ฐานข้อมูลปฏิเสธคำสั่งลบ/แก้ไขที่ไม่มี Secret Key</p>
         </div>
 
         <div class="flex items-center justify-between p-3 rounded-lg bg-slate-50 border border-slate-200">
@@ -503,6 +518,75 @@
       </div>
       <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-end">
         <button onclick="closeCloudModal()" class="px-4 py-1.5 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-100 font-medium text-xs">ปิด</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: SECRET KEY & ACCESS CONTROL -->
+  <div id="secretKeyModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full flex flex-col border border-slate-200 overflow-hidden">
+      <div class="px-6 py-4 bg-gradient-to-r from-amber-700 to-amber-900 text-white flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <svg class="w-5 h-5 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          <div>
+            <h3 class="text-base font-bold">สิทธิ์การใช้งาน (Secret Key)</h3>
+            <p class="text-xs text-amber-200/80">ควบคุมสิทธิ์การเพิ่ม แก้ไข และลบข้อมูลระดับฐานข้อมูล</p>
+          </div>
+        </div>
+        <button onclick="closeSecretKeyModal()" class="text-amber-200 hover:text-white p-1 rounded-lg hover:bg-white/10">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="p-6 space-y-4 text-xs sm:text-sm">
+        
+        <!-- Status Box -->
+        <div id="secretStatusBox" class="p-3 rounded-xl border flex items-center justify-between bg-amber-50 border-amber-200">
+          <div>
+            <span class="text-xs font-semibold text-slate-700 block">สถานะปัจจุบันของคุณ:</span>
+            <span id="secretStatusLabel" class="text-xs font-bold text-amber-700">🔒 ผู้ใช้งานทั่วไป (อ่าน/ค้นหาอย่างเดียว)</span>
+          </div>
+          <span id="secretBadgeIcon" class="text-lg">🔒</span>
+        </div>
+
+        <!-- Unlock Form -->
+        <div id="unlockSection" class="space-y-2">
+          <label class="block text-slate-700 font-semibold mb-1">ใส่ Secret Key เพื่อปลดล็อกสิทธิ์ผู้ดูแลระบบ (Admin):</label>
+          <div class="relative">
+            <input type="password" id="userSecretInput" placeholder="กรอก Secret Key..." class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none text-xs font-mono pr-10">
+            <button type="button" onclick="togglePasswordVisibility('userSecretInput')" class="absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 text-xs">👁️</button>
+          </div>
+          <div class="flex items-center justify-between pt-1">
+            <span class="text-[11px] text-slate-400">คีย์เริ่มต้นระบบ: <code class="bg-slate-100 px-1 py-0.5 rounded font-mono text-slate-600">RTAF23-ADMIN-KEY</code></span>
+            <button type="button" onclick="unlockAdminAccess()" class="px-4 py-1.5 bg-amber-600 hover:bg-amber-500 text-white font-semibold rounded-lg text-xs shadow transition-colors">
+              ปลดล็อกสิทธิ์
+            </button>
+          </div>
+        </div>
+
+        <!-- Admin Controls (Visible when Unlocked) -->
+        <div id="adminManageSection" class="hidden space-y-3 pt-3 border-t border-slate-200">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-emerald-700 flex items-center gap-1">
+              <span>✅</span> ปลดล็อกสิทธิ์สำเร็จแล้ว (สามารถ เพิ่ม/แก้ไข/ลบ ได้)
+            </span>
+            <button type="button" onclick="lockAdminAccess()" class="px-2.5 py-1 text-xs border border-slate-300 text-slate-600 hover:bg-slate-100 rounded-md">
+              ล็อกสิทธิ์กลับ
+            </button>
+          </div>
+
+          <!-- Change Secret Key Option -->
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+            <span class="text-xs font-semibold text-slate-700 block">เปลี่ยน Secret Key ประจำหน่วย:</span>
+            <input type="password" id="newSecretKeyInput" placeholder="ระบุ Secret Key รหัสใหม่..." class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 text-xs font-mono">
+            <button type="button" onclick="changeAdminSecretKey()" class="w-full py-1.5 bg-slate-800 hover:bg-slate-700 text-white font-medium rounded-lg text-xs transition-colors">
+              บันทึก Secret Key ใหม่
+            </button>
+          </div>
+        </div>
+
+      </div>
+      <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-end">
+        <button onclick="closeSecretKeyModal()" class="px-4 py-1.5 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-100 font-medium text-xs">ปิด</button>
       </div>
     </div>
   </div>
@@ -957,6 +1041,9 @@
 
       // Setup Cloud Realtime Sync if configured
       setupCloudSync();
+
+      // Setup Admin / Secret Key Access UI
+      updateAdminAccessUI();
     }
 
     // Save and Trigger Realtime Broadcast & Cloud Push
@@ -1089,17 +1176,153 @@
       return url;
     }
 
+    const DEFAULT_ADMIN_SECRET = 'RTAF23-ADMIN-KEY';
+
+    function getDatabaseSecretKey() {
+      return localStorage.getItem('RTAF_CLOUD_DB_SECRET') || localStorage.getItem('RTAF_ADMIN_SECRET') || DEFAULT_ADMIN_SECRET;
+    }
+
+    function isAdminUnlocked() {
+      return sessionStorage.getItem('RTAF_ADMIN_UNLOCKED') === 'true' || localStorage.getItem('RTAF_ADMIN_UNLOCKED') === 'true';
+    }
+
+    function updateAdminAccessUI() {
+      const unlocked = isAdminUnlocked();
+      const btn = document.getElementById('adminAuthBtn');
+      const roleText = document.getElementById('adminRoleText');
+      const icon = document.getElementById('adminLockIcon');
+      const statusLabel = document.getElementById('secretStatusLabel');
+      const badgeIcon = document.getElementById('secretBadgeIcon');
+      const statusBox = document.getElementById('secretStatusBox');
+      const unlockSec = document.getElementById('unlockSection');
+      const manageSec = document.getElementById('adminManageSection');
+
+      if (unlocked) {
+        if (btn) {
+          btn.className = "inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500/20 text-emerald-200 border border-emerald-400/50 hover:bg-emerald-500/30 shadow transition-all";
+        }
+        if (roleText) roleText.innerText = "สิทธิ์: แอดมิน (ปลดล็อกแล้ว)";
+        if (icon) {
+          icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/>';
+          icon.className = "w-3.5 h-3.5 text-emerald-300";
+        }
+        if (statusLabel) {
+          statusLabel.innerText = "🔓 ผู้ดูแลระบบ (Admin) - มีสิทธิ์เต็มในการ เพิ่ม แก้ไข และลบข้อมูล";
+          statusLabel.className = "text-xs font-bold text-emerald-700";
+        }
+        if (badgeIcon) badgeIcon.innerText = "🔓";
+        if (statusBox) {
+          statusBox.className = "p-3 rounded-xl border flex items-center justify-between bg-emerald-50 border-emerald-200";
+        }
+        if (unlockSec) unlockSec.classList.add('hidden');
+        if (manageSec) manageSec.classList.remove('hidden');
+      } else {
+        if (btn) {
+          btn.className = "inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-amber-500/20 text-amber-200 border border-amber-400/40 hover:bg-amber-500/30 shadow transition-all";
+        }
+        if (roleText) roleText.innerText = "สิทธิ์: ทั่วไป (อ่านอย่างเดียว)";
+        if (icon) {
+          icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>';
+          icon.className = "w-3.5 h-3.5 text-amber-300";
+        }
+        if (statusLabel) {
+          statusLabel.innerText = "🔒 ผู้ใช้งานทั่วไป (อ่าน/ค้นหาอย่างเดียว) - ต้องใส่ Secret Key เพื่อแก้ไข";
+          statusLabel.className = "text-xs font-bold text-amber-700";
+        }
+        if (badgeIcon) badgeIcon.innerText = "🔒";
+        if (statusBox) {
+          statusBox.className = "p-3 rounded-xl border flex items-center justify-between bg-amber-50 border-amber-200";
+        }
+        if (unlockSec) unlockSec.classList.remove('hidden');
+        if (manageSec) manageSec.classList.add('hidden');
+      }
+    }
+
+    // Secret Key Modal Functions
+    function openSecretKeyModal() {
+      updateAdminAccessUI();
+      const input = document.getElementById('userSecretInput');
+      if (input) input.value = '';
+      document.getElementById('secretKeyModal').classList.remove('hidden');
+    }
+
+    function closeSecretKeyModal() {
+      document.getElementById('secretKeyModal').classList.add('hidden');
+    }
+
+    function unlockAdminAccess() {
+      const input = document.getElementById('userSecretInput');
+      const val = input ? input.value.trim() : '';
+      const validKey = getDatabaseSecretKey();
+
+      if (val === validKey) {
+        localStorage.setItem('RTAF_ADMIN_UNLOCKED', 'true');
+        sessionStorage.setItem('RTAF_ADMIN_UNLOCKED', 'true');
+        updateAdminAccessUI();
+        alert('✅ ปลดล็อกสิทธิ์ผู้ดูแลระบบ (Admin) เรียบร้อยแล้ว!');
+        closeSecretKeyModal();
+      } else {
+        alert('❌ Secret Key ไม่ถูกต้อง กรุณาตรวจสอบและลองใหม่อีกครั้ง');
+      }
+    }
+
+    function lockAdminAccess() {
+      localStorage.removeItem('RTAF_ADMIN_UNLOCKED');
+      sessionStorage.removeItem('RTAF_ADMIN_UNLOCKED');
+      updateAdminAccessUI();
+      alert('🔒 ล็อกสิทธิ์กลับเป็นโหมดผู้ใช้งานทั่วไป (อ่านอย่างเดียว) เรียบร้อยแล้ว');
+      closeSecretKeyModal();
+    }
+
+    function changeAdminSecretKey() {
+      const input = document.getElementById('newSecretKeyInput');
+      const newKey = input ? input.value.trim() : '';
+      if (!newKey || newKey.length < 4) {
+        alert('กรุณาระบุ Secret Key ใหม่ที่มีความยาวอย่างน้อย 4 ตัวอักษร');
+        return;
+      }
+      localStorage.setItem('RTAF_ADMIN_SECRET', newKey);
+      localStorage.setItem('RTAF_CLOUD_DB_SECRET', newKey);
+      input.value = '';
+      alert('✅ เปลี่ยน Secret Key ประจำฐานข้อมูลเรียบร้อยแล้ว: ' + newKey);
+      closeSecretKeyModal();
+    }
+
+    function togglePasswordVisibility(fieldId) {
+      const el = document.getElementById(fieldId);
+      if (el) {
+        el.type = (el.type === 'password') ? 'text' : 'password';
+      }
+    }
+
     async function pushToCloudRealtime() {
-      const cloudUrl = getCloudDbUrl();
+      let cloudUrl = getCloudDbUrl();
       if (!cloudUrl || isCloudSyncing) return;
       try {
         isCloudSyncing = true;
+        const secretKey = getDatabaseSecretKey();
+        const headers = { 'Content-Type': 'application/json' };
+
+        // Attach Secret Key at Database Request Level
+        if (secretKey) {
+          headers['Authorization'] = 'Bearer ' + secretKey;
+          headers['X-Secret-Key'] = secretKey;
+          if (cloudUrl.includes('firebaseio.com') || cloudUrl.includes('firebasedatabase.app')) {
+            const separator = cloudUrl.includes('?') ? '&' : '?';
+            cloudUrl += separator + 'auth=' + encodeURIComponent(secretKey);
+          }
+        }
+
         const method = (cloudUrl.includes('firebaseio.com') || cloudUrl.includes('firebasedatabase.app')) ? 'PUT' : 'POST';
-        await fetch(cloudUrl, {
+        const res = await fetch(cloudUrl, {
           method: method,
-          headers: { 'Content-Type': 'application/json' },
+          headers: headers,
           body: JSON.stringify(assets)
         });
+
+        if (!res.ok && (res.status === 401 || res.status === 403)) {
+          console.warn('Database write rejected: Secret Key unauthorized');
+        }
       } catch (err) {
         console.warn('Cloud sync push warning:', err);
       } finally {
@@ -1108,10 +1331,21 @@
     }
 
     async function pullFromCloudRealtime() {
-      const cloudUrl = getCloudDbUrl();
+      let cloudUrl = getCloudDbUrl();
       if (!cloudUrl || isCloudSyncing) return;
       try {
-        const res = await fetch(cloudUrl, { method: 'GET', cache: 'no-cache' });
+        const secretKey = getDatabaseSecretKey();
+        const headers = {};
+        if (secretKey) {
+          headers['Authorization'] = 'Bearer ' + secretKey;
+          headers['X-Secret-Key'] = secretKey;
+          if (cloudUrl.includes('firebaseio.com') || cloudUrl.includes('firebasedatabase.app')) {
+            const separator = cloudUrl.includes('?') ? '&' : '?';
+            cloudUrl += separator + 'auth=' + encodeURIComponent(secretKey);
+          }
+        }
+
+        const res = await fetch(cloudUrl, { method: 'GET', headers: headers, cache: 'no-cache' });
         if (res.ok) {
           let remoteData = await res.json();
           // Support Firebase object with numeric keys
@@ -1141,7 +1375,10 @@
     // Cloud Modal Handlers
     function openCloudModal() {
       const rawUrl = localStorage.getItem('RTAF_CLOUD_DB_URL') || DEFAULT_CLOUD_URL;
+      const secret = localStorage.getItem('RTAF_CLOUD_DB_SECRET') || getDatabaseSecretKey();
       document.getElementById('cloudDbUrlInput').value = (rawUrl === 'OFFLINE') ? '' : rawUrl;
+      const secretInput = document.getElementById('cloudDbSecretInput');
+      if (secretInput) secretInput.value = secret;
       document.getElementById('cloudModal').classList.remove('hidden');
     }
 
@@ -1151,7 +1388,10 @@
 
     async function testAndSaveCloudDb() {
       const input = document.getElementById('cloudDbUrlInput');
+      const secretInput = document.getElementById('cloudDbSecretInput');
       let url = input.value.trim();
+      let secret = secretInput ? secretInput.value.trim() : '';
+
       if (!url) {
         alert('กรุณากรอก URL ฐานข้อมูล Firebase หรือ REST API');
         return;
@@ -1161,26 +1401,36 @@
       let testUrl = url.replace(/\/+$/, '');
       if (testUrl.includes('firebaseio.com') || testUrl.includes('firebasedatabase.app')) {
         if (!testUrl.endsWith('.json')) testUrl += '/assets.json';
+        if (secret) testUrl += (testUrl.includes('?') ? '&' : '?') + 'auth=' + encodeURIComponent(secret);
       }
 
       try {
-        // Test push current assets
+        const headers = { 'Content-Type': 'application/json' };
+        if (secret) {
+          headers['Authorization'] = 'Bearer ' + secret;
+          headers['X-Secret-Key'] = secret;
+        }
+
         const testRes = await fetch(testUrl, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          method: (testUrl.includes('firebaseio.com') || testUrl.includes('firebasedatabase.app')) ? 'PUT' : 'POST',
+          headers: headers,
           body: JSON.stringify(assets)
         });
 
         if (testRes.ok) {
           localStorage.setItem('RTAF_CLOUD_DB_URL', url);
+          if (secret) {
+            localStorage.setItem('RTAF_CLOUD_DB_SECRET', secret);
+            localStorage.setItem('RTAF_ADMIN_SECRET', secret);
+          }
           setupCloudSync();
-          alert('เชื่อมต่อฐานข้อมูลคลาวด์เรียลไทม์สำเร็จ! ข้อมูลคอมพิวเตอร์จะซิงค์หากันแบบเรียลไทม์ทันที');
+          alert('เชื่อมต่อฐานข้อมูลคลาวด์เรียลไทม์พร้อม Secret Key สำเร็จ!');
           closeCloudModal();
         } else {
-          alert('ไม่สามารถเชื่อมต่อได้ (รหัสตอบกลับ: ' + testRes.status + ') กรุณาตรวจสอบสิทธิ์ Read/Write ของฐานข้อมูล');
+          alert('ไม่สามารถเชื่อมต่อได้ (รหัสตอบกลับ: ' + testRes.status + ') กรุณาตรวจสอบสิทธิ์และ Secret Key');
         }
       } catch (e) {
-        alert('เกิดข้อผิดพลาดในการเชื่อมต่อ: ' + e.message + '\nกรุณาตรวจสอบว่า URL ถูกต้องและเปิดสิทธิ์ CORS/Public Read/Write แล้ว');
+        alert('เกิดข้อผิดพลาดในการเชื่อมต่อ: ' + e.message + '\nกรุณาตรวจสอบว่า URL และ Secret Key ถูกต้อง');
       }
     }
 
@@ -1219,6 +1469,12 @@
     }
 
     function restoreFromFile(event) {
+      if (!isAdminUnlocked()) {
+        openSecretKeyModal();
+        alert('🔒 การกู้คืนหรือนำเข้าข้อมูลจำเป็นต้องใช้ Secret Key เพื่อยืนยันสิทธิ์');
+        event.target.value = '';
+        return;
+      }
       const file = event.target.files[0];
       if (!file) return;
 
@@ -1466,6 +1722,11 @@
 
     // Modal Operations
     function openModal(editIndex = -1) {
+      if (!isAdminUnlocked()) {
+        openSecretKeyModal();
+        alert('🔒 การเพิ่มหรือแก้ไขข้อมูลจำเป็นต้องใช้ Secret Key เพื่อยืนยันสิทธิ์ผู้ดูแลระบบ\n(กรุณาใส่ Secret Key เพื่อปลดล็อก)');
+        return;
+      }
       document.getElementById('editIndex').value = editIndex;
       const modal = document.getElementById('assetModal');
       const title = document.getElementById('modalTitle');
@@ -1517,6 +1778,11 @@
     }
 
     function deleteAsset(index) {
+      if (!isAdminUnlocked()) {
+        openSecretKeyModal();
+        alert('🔒 การลบข้อมูลจำเป็นต้องใช้ Secret Key เพื่อยืนยันสิทธิ์ผู้ดูแลระบบ\n(กรุณาใส่ Secret Key เพื่อปลดล็อก)');
+        return;
+      }
       const a = assets[index];
       if (!a) return;
       if (confirm(`ยืนยันการลบเครื่อง "${a.computerName || a.assetId}" ออกจากระบบใช่หรือไม่?\n(ข้อมูลจะถูกลบออกจากฐานข้อมูลออนไลน์เรียลไทม์ทันที)`)) {
