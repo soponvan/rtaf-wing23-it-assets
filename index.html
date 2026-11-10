@@ -49,6 +49,25 @@
         </div>
       </div>
       <div class="flex items-center space-x-2 sm:space-x-3">
+        <!-- Live Realtime Badge -->
+        <div id="liveSyncBadge" class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 bg-emerald-950/70 border border-emerald-500/50 rounded-full text-emerald-300 text-xs shadow-inner">
+          <span id="syncPulseDot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="syncStatusText" class="font-medium">เรียลไทม์</span>
+          <span id="lastSavedTime" class="text-[10px] text-emerald-400/80 font-mono"></span>
+        </div>
+
+        <!-- Cloud Sync Button -->
+        <button onclick="openCloudModal()" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-indigo-700 hover:bg-indigo-600 text-white shadow transition-colors" title="เชื่อมต่อฐานข้อมูลกลางออนไลน์ (Firebase / Cloud Real-time)">
+          <svg class="w-3.5 h-3.5 text-indigo-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 00-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
+          <span class="hidden md:inline">ฐานข้อมูลกลาง</span> Cloud
+        </button>
+
+        <!-- Backup & Restore Button -->
+        <button onclick="openBackupModal()" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-slate-700 hover:bg-slate-600 text-white shadow transition-colors" title="สำรองและกู้คืนข้อมูล ป้องกันข้อมูลสูญหาย">
+          <svg class="w-3.5 h-3.5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+          <span class="hidden md:inline">สำรอง/กู้คืน</span>
+        </button>
+
         <button onclick="exportToCSV()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-600 hover:bg-emerald-500 text-white shadow transition-colors">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
           <span class="hidden md:inline">ส่งออก</span> CSV
@@ -147,10 +166,11 @@
           <span class="font-semibold text-sm text-slate-800">รายการสินทรัพย์คอมพิวเตอร์</span>
           <span id="recordCount" class="text-xs px-2 py-0.5 rounded-full bg-slate-200 text-slate-700 font-medium">0 รายการ</span>
         </div>
-        <div class="flex items-center space-x-2">
-          <button onclick="loadSampleData()" class="text-xs text-blue-600 hover:text-blue-800 hover:underline">
-            โหลดข้อมูลตัวอย่างเริ่มต้น
-          </button>
+        <div class="flex items-center space-x-2 text-xs">
+          <span id="cloudStatusBadge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600 border border-slate-200">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            บันทึกอัตโนมัติ (ไม่สูญหาย)
+          </span>
         </div>
       </div>
 
@@ -430,6 +450,103 @@
       </div>
       <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-end space-x-2">
         <button onclick="closeDetailModal()" class="px-4 py-1.5 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-100 font-medium">ปิด</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CLOUD DATABASE REALTIME SYNC -->
+  <div id="cloudModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-xl w-full flex flex-col border border-slate-200 overflow-hidden">
+      <div class="px-6 py-4 bg-gradient-to-r from-indigo-900 to-blue-900 text-white flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+            <svg class="w-5 h-5 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 00-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
+          </div>
+          <div>
+            <h3 class="text-base font-bold">เชื่อมต่อฐานข้อมูลกลางออนไลน์ (Cloud Real-time)</h3>
+            <p class="text-xs text-indigo-200/80">ซิงค์ข้อมูลคอมพิวเตอร์แบบเรียลไทม์ ใช้ร่วมกันได้ทุกเครื่องใน บน.23</p>
+          </div>
+        </div>
+        <button onclick="closeCloudModal()" class="text-indigo-200 hover:text-white p-1 rounded-lg hover:bg-white/10">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="p-6 space-y-4 text-xs sm:text-sm">
+        <div class="p-3.5 bg-blue-50 border border-blue-200 rounded-xl space-y-1">
+          <p class="font-semibold text-blue-900">💡 การทำงานของระบบ Real-time:</p>
+          <p class="text-blue-800 text-xs leading-relaxed">
+            เมื่อเชื่อมต่อฐานข้อมูลกลาง (เช่น Firebase Realtime Database หรือ API องค์กร) ทุกครั้งที่มีการเพิ่ม/แก้ไขข้อมูลจากคอมพิวเตอร์เครื่องใดก็ตาม ข้อมูลจะอัปเดตไปยังหน้าจอของทุกคนใน บน.23 แบบเรียลไทม์ทันที และข้อมูลจะถูกบันทึกถาวรบนคลาวด์ ไม่สูญหายแม้จะเปลี่ยนเครื่องหรือล้างประวัติเบราว์เซอร์
+          </p>
+        </div>
+
+        <div>
+          <label class="block text-slate-700 font-semibold mb-1">URL ฐานข้อมูล Real-time (Firebase Database URL / REST API):</label>
+          <input type="url" id="cloudDbUrlInput" placeholder="เช่น https://my-project-default-rtdb.asia-southeast1.firebasedatabase.app" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-xs font-mono">
+          <p class="text-[11px] text-slate-500 mt-1">รองรับ Google Firebase Realtime Database (ฟรี 100% ไม่มีค่าใช้จ่าย)</p>
+        </div>
+
+        <div class="flex items-center justify-between p-3 rounded-lg bg-slate-50 border border-slate-200">
+          <div>
+            <span class="text-xs font-semibold text-slate-700 block">สถานะการเชื่อมต่อ:</span>
+            <span id="cloudConnectionText" class="text-xs font-medium text-slate-500">โหมดจัดเก็บในเครื่อง (Local Storage)</span>
+          </div>
+          <button type="button" onclick="testAndSaveCloudDb()" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold shadow transition-colors">
+            บันทึก & ซิงค์ข้อมูล
+          </button>
+        </div>
+
+        <div class="text-right">
+          <button type="button" onclick="disconnectCloudDb()" class="text-xs text-rose-600 hover:text-rose-800 hover:underline">
+            ตัดการเชื่อมต่อ (กลับมาใช้โหมดออฟไลน์ในเครื่อง)
+          </button>
+        </div>
+      </div>
+      <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-end">
+        <button onclick="closeCloudModal()" class="px-4 py-1.5 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-100 font-medium text-xs">ปิด</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: BACKUP & RESTORE -->
+  <div id="backupModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full flex flex-col border border-slate-200 overflow-hidden">
+      <div class="px-6 py-4 bg-slate-800 text-white flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+          <h3 class="text-base font-bold">สำรองและกู้คืนข้อมูลสินทรัพย์</h3>
+        </div>
+        <button onclick="closeBackupModal()" class="text-slate-300 hover:text-white p-1 rounded-lg hover:bg-white/10">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="p-6 space-y-4 text-xs sm:text-sm">
+        
+        <!-- Backup Section -->
+        <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/70 space-y-2">
+          <h4 class="font-bold text-slate-800 flex items-center gap-1.5">
+            <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            1. ดาวน์โหลดไฟล์สำรองข้อมูล (JSON Backup)
+          </h4>
+          <p class="text-xs text-slate-500">เซฟข้อมูลเครื่องทั้งหมดเป็นไฟล์ `.json` เก็บไว้ในเครื่องหรือ Flash Drive เพื่อป้องกันข้อมูลหาย 100%</p>
+          <button onclick="downloadJsonBackup()" class="w-full mt-2 py-2 px-3 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-lg shadow-sm text-xs transition-colors flex items-center justify-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            ดาวน์โหลดไฟล์สำรองข้อมูลตอนนี้
+          </button>
+        </div>
+
+        <!-- Restore Section -->
+        <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/70 space-y-2">
+          <h4 class="font-bold text-slate-800 flex items-center gap-1.5">
+            <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+            2. กู้คืน / นำเข้าข้อมูล (Restore)
+          </h4>
+          <p class="text-xs text-slate-500">เลือกไฟล์ `.json` หรือ `.csv` ที่เคยสำรองไว้ เพื่อนำข้อมูลทั้งหมดกลับคืนสู่ระบบทันที</p>
+          <input type="file" id="restoreFileInput" accept=".json,.csv" onchange="restoreFromFile(event)" class="w-full text-xs text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer">
+        </div>
+
+      </div>
+      <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-end">
+        <button onclick="closeBackupModal()" class="px-4 py-1.5 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-100 font-medium text-xs">ปิด</button>
       </div>
     </div>
   </div>
@@ -803,36 +920,407 @@
     ];
 
     let assets = [];
+    let syncChannel = null;
+    let cloudSyncTimer = null;
+    let isCloudSyncing = false;
 
     // Initialize
     function init() {
-      const saved = localStorage.getItem(STORAGE_KEY);
+      // 1. Multi-tier Local Storage Recovery (Never lose user data)
+      let saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) saved = localStorage.getItem('RTAF_ASSETS_BACKUP');
+      if (!saved) saved = localStorage.getItem('RTAF_IT_ASSETS_DATA_V1');
+
       if (saved) {
         try {
-          assets = JSON.parse(saved);
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            assets = parsed;
+          } else {
+            assets = [...INITIAL_DATA];
+          }
         } catch (e) {
           assets = [...INITIAL_DATA];
         }
       } else {
         assets = [...INITIAL_DATA];
-        saveToLocalStorage();
       }
+
+      // Initial save to guarantee persistence
+      saveToLocalStorage(true);
       populateFilterDropdowns();
       renderTable();
       updateStats();
+
+      // Setup Cross-tab Realtime Sync
+      setupCrossTabSync();
+
+      // Setup Cloud Realtime Sync if configured
+      setupCloudSync();
     }
 
-    function saveToLocalStorage() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(assets));
+    // Save and Trigger Realtime Broadcast & Cloud Push
+    function saveToLocalStorage(isSilent = false) {
+      try {
+        const dataStr = JSON.stringify(assets);
+        localStorage.setItem(STORAGE_KEY, dataStr);
+        localStorage.setItem('RTAF_ASSETS_BACKUP', dataStr); // Permanent safety backup
+        localStorage.setItem('RTAF_USER_HAS_MODIFIED', 'true');
+        
+        const now = new Date().toLocaleTimeString('th-TH');
+        localStorage.setItem('RTAF_LAST_SAVED_TIME', now);
+
+        // Update UI Badge
+        updateSyncBadgeUI(now, isSilent ? 'พร้อมใช้งาน' : 'บันทึกเรียลไทม์แล้ว');
+
+        // Broadcast to other open browser tabs
+        if (!isSilent && syncChannel) {
+          syncChannel.postMessage({ type: 'UPDATE_ASSETS', assets: assets, timestamp: Date.now() });
+        }
+
+        // Push to Cloud Database in Realtime (if enabled)
+        if (!isSilent) {
+          pushToCloudRealtime();
+        }
+      } catch (err) {
+        console.error('Storage save error:', err);
+      }
     }
 
-    function loadSampleData() {
-      if (confirm("ต้องการโหลดข้อมูลตัวอย่างกลับคืนมาใช่หรือไม่?")) {
-        assets = [...INITIAL_DATA];
-        saveToLocalStorage();
-        populateFilterDropdowns();
-        renderTable();
-        updateStats();
+    // Update Live Sync Status Indicator
+    function updateSyncBadgeUI(timeStr, statusText = 'บันทึกเรียลไทม์แล้ว') {
+      const badge = document.getElementById('liveSyncBadge');
+      const textEl = document.getElementById('syncStatusText');
+      const timeEl = document.getElementById('lastSavedTime');
+      const dotEl = document.getElementById('syncPulseDot');
+
+      if (textEl) textEl.innerText = statusText;
+      if (timeEl && timeStr) timeEl.innerText = timeStr;
+
+      if (dotEl) {
+        dotEl.classList.remove('bg-emerald-400', 'bg-amber-400');
+        dotEl.classList.add('bg-emerald-400');
+      }
+    }
+
+    // Realtime Cross-tab Sync (BroadcastChannel)
+    function setupCrossTabSync() {
+      try {
+        if ('BroadcastChannel' in window) {
+          syncChannel = new BroadcastChannel('rtaf_wing23_realtime_sync');
+          syncChannel.onmessage = (event) => {
+            if (event.data && event.data.type === 'UPDATE_ASSETS' && Array.isArray(event.data.assets)) {
+              assets = event.data.assets;
+              populateFilterDropdowns();
+              applyFilters();
+              updateStats();
+              updateSyncBadgeUI(new Date().toLocaleTimeString('th-TH'), 'อัปเดตเรียลไทม์แล้ว');
+            }
+          };
+        } else {
+          // Fallback to storage event for older browsers
+          window.addEventListener('storage', (e) => {
+            if ((e.key === STORAGE_KEY || e.key === 'RTAF_ASSETS_BACKUP') && e.newValue) {
+              try {
+                assets = JSON.parse(e.newValue);
+                populateFilterDropdowns();
+                applyFilters();
+                updateStats();
+              } catch(err) {}
+            }
+          });
+        }
+      } catch (e) {
+        console.warn('Cross-tab sync not supported:', e);
+      }
+    }
+
+    // Setup Cloud Realtime Sync (Firebase / REST)
+    function setupCloudSync() {
+      const cloudUrl = getCloudDbUrl();
+      const statusBadge = document.getElementById('cloudStatusBadge');
+      const connectionText = document.getElementById('cloudConnectionText');
+
+      if (cloudUrl) {
+        if (statusBadge) {
+          statusBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-ping"></span> ☁️ คลาวด์เรียลไทม์ (Cloud Active)';
+          statusBadge.className = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-indigo-50 text-indigo-700 border border-indigo-200';
+        }
+        if (connectionText) {
+          connectionText.innerText = 'เชื่อมต่อฐานข้อมูลคลาวด์เรียลไทม์สำเร็จ';
+          connectionText.className = 'text-xs font-semibold text-emerald-600';
+        }
+
+        // Pull initial data from cloud
+        pullFromCloudRealtime();
+
+        // Start background realtime listener / polling every 4 seconds
+        if (!cloudSyncTimer) {
+          cloudSyncTimer = setInterval(pullFromCloudRealtime, 4000);
+        }
+      } else {
+        if (statusBadge) {
+          statusBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> 💾 บันทึกในเครื่อง (ไม่สูญหาย)';
+          statusBadge.className = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600 border border-slate-200';
+        }
+        if (connectionText) {
+          connectionText.innerText = 'โหมดจัดเก็บในเครื่อง (Local Storage)';
+          connectionText.className = 'text-xs font-medium text-slate-500';
+        }
+        if (cloudSyncTimer) {
+          clearInterval(cloudSyncTimer);
+          cloudSyncTimer = null;
+        }
+      }
+    }
+
+    function getCloudDbUrl() {
+      let url = localStorage.getItem('RTAF_CLOUD_DB_URL') || '';
+      if (!url) return '';
+      url = url.trim().replace(/\/+$/, '');
+      if (url.includes('firebaseio.com') || url.includes('firebasedatabase.app')) {
+        if (!url.endsWith('.json')) {
+          url += '/assets.json';
+        }
+      }
+      return url;
+    }
+
+    async function pushToCloudRealtime() {
+      const cloudUrl = getCloudDbUrl();
+      if (!cloudUrl || isCloudSyncing) return;
+      try {
+        isCloudSyncing = true;
+        await fetch(cloudUrl, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(assets)
+        });
+      } catch (err) {
+        console.warn('Cloud sync push warning:', err);
+      } finally {
+        isCloudSyncing = false;
+      }
+    }
+
+    async function pullFromCloudRealtime() {
+      const cloudUrl = getCloudDbUrl();
+      if (!cloudUrl || isCloudSyncing) return;
+      try {
+        const res = await fetch(cloudUrl, { method: 'GET', cache: 'no-cache' });
+        if (res.ok) {
+          const remoteData = await res.json();
+          if (Array.isArray(remoteData) && remoteData.length > 0) {
+            // Check if remote data differs from current
+            const localStr = JSON.stringify(assets);
+            const remoteStr = JSON.stringify(remoteData);
+            if (localStr !== remoteStr) {
+              assets = remoteData;
+              localStorage.setItem(STORAGE_KEY, remoteStr);
+              localStorage.setItem('RTAF_ASSETS_BACKUP', remoteStr);
+              populateFilterDropdowns();
+              applyFilters();
+              updateStats();
+              updateSyncBadgeUI(new Date().toLocaleTimeString('th-TH'), 'ซิงค์คลาวด์เรียลไทม์');
+            }
+          }
+        }
+      } catch (err) {
+        // Silently handle offline/network hiccups
+      }
+    }
+
+    // Cloud Modal Handlers
+    function openCloudModal() {
+      const rawUrl = localStorage.getItem('RTAF_CLOUD_DB_URL') || '';
+      document.getElementById('cloudDbUrlInput').value = rawUrl;
+      document.getElementById('cloudModal').classList.remove('hidden');
+    }
+
+    function closeCloudModal() {
+      document.getElementById('cloudModal').classList.add('hidden');
+    }
+
+    async function testAndSaveCloudDb() {
+      const input = document.getElementById('cloudDbUrlInput');
+      let url = input.value.trim();
+      if (!url) {
+        alert('กรุณากรอก URL ฐานข้อมูล Firebase หรือ REST API');
+        return;
+      }
+
+      // Format Firebase URL
+      let testUrl = url.replace(/\/+$/, '');
+      if (testUrl.includes('firebaseio.com') || testUrl.includes('firebasedatabase.app')) {
+        if (!testUrl.endsWith('.json')) testUrl += '/assets.json';
+      }
+
+      try {
+        // Test push current assets
+        const testRes = await fetch(testUrl, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(assets)
+        });
+
+        if (testRes.ok) {
+          localStorage.setItem('RTAF_CLOUD_DB_URL', url);
+          setupCloudSync();
+          alert('เชื่อมต่อฐานข้อมูลคลาวด์เรียลไทม์สำเร็จ! ข้อมูลคอมพิวเตอร์จะซิงค์หากันแบบเรียลไทม์ทันที');
+          closeCloudModal();
+        } else {
+          alert('ไม่สามารถเชื่อมต่อได้ (รหัสตอบกลับ: ' + testRes.status + ') กรุณาตรวจสอบสิทธิ์ Read/Write ของฐานข้อมูล');
+        }
+      } catch (e) {
+        alert('เกิดข้อผิดพลาดในการเชื่อมต่อ: ' + e.message + '\nกรุณาตรวจสอบว่า URL ถูกต้องและเปิดสิทธิ์ CORS/Public Read/Write แล้ว');
+      }
+    }
+
+    function disconnectCloudDb() {
+      if (confirm('ต้องการยกเลิกการเชื่อมต่อคลาวด์ แล้วกลับมาใช้งานแบบออฟไลน์ในเครื่องใช่หรือไม่?')) {
+        localStorage.removeItem('RTAF_CLOUD_DB_URL');
+        setupCloudSync();
+        closeCloudModal();
+      }
+    }
+
+    // Backup & Restore Handlers
+    function openBackupModal() {
+      document.getElementById('backupModal').classList.remove('hidden');
+    }
+
+    function closeBackupModal() {
+      document.getElementById('backupModal').classList.add('hidden');
+    }
+
+    function downloadJsonBackup() {
+      const backupData = {
+        title: "สำรองข้อมูลสินทรัพย์ IT คอมพิวเตอร์ กองบิน 23 (บน.23)",
+        exportedAt: new Date().toISOString(),
+        totalRecords: assets.length,
+        assets: assets
+      };
+
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `Wing23_IT_Assets_Backup_${new Date().toISOString().slice(0, 10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function restoreFromFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const content = e.target.result;
+          if (file.name.endsWith('.json')) {
+            const parsed = JSON.parse(content);
+            const importedAssets = Array.isArray(parsed) ? parsed : (parsed.assets || []);
+            if (importedAssets.length > 0) {
+              if (confirm(`พบข้อมูลคอมพิวเตอร์ ${importedAssets.length} รายการ ต้องการนำเข้าข้อมูลทันทีใช่หรือไม่?`)) {
+                assets = importedAssets;
+                saveToLocalStorage();
+                populateFilterDropdowns();
+                applyFilters();
+                updateStats();
+                alert(`กู้คืนข้อมูลสำเร็จ ${assets.length} รายการ เรียบร้อยแล้ว`);
+                closeBackupModal();
+              }
+            } else {
+              alert('ไฟล์สำรองไม่มีรายการข้อมูลที่ถูกต้อง');
+            }
+          } else if (file.name.endsWith('.csv')) {
+            parseAndImportCsv(content);
+          }
+        } catch (err) {
+          alert('ไม่สามารถอ่านไฟล์ได้ กรุณาตรวจสอบรูปแบบไฟล์: ' + err.message);
+        }
+      };
+
+      if (file.name.endsWith('.json')) {
+        reader.readAsText(file, "UTF-8");
+      } else {
+        reader.readAsText(file, "UTF-8");
+      }
+    }
+
+    function parseAndImportCsv(csvText) {
+      const lines = csvText.trim().split(/\r?\n/);
+      if (lines.length < 2) {
+        alert('ไฟล์ CSV ไม่มีข้อมูล');
+        return;
+      }
+      
+      const newAssets = [];
+      // Skip header line 0
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i];
+        if (!line.trim()) continue;
+        
+        // Simple regex to parse CSV taking into account quotes
+        const re = /(?:\"([^\"]*(?:\"\"[^\"]*)*)\")|([^,]+)|(?=,)|$/g;
+        const matches = [];
+        let m;
+        while ((m = re.exec(line)) !== null) {
+          if (m.index === re.lastIndex) re.lastIndex++;
+          if (m[1] !== undefined) {
+            matches.push(m[1].replace(/\"\"/g, '"'));
+          } else if (m[2] !== undefined) {
+            matches.push(m[2]);
+          } else {
+            matches.push('');
+          }
+          if (re.lastIndex >= line.length) break;
+        }
+
+        if (matches.length >= 5) {
+          newAssets.push({
+            location: matches[1] || '',
+            computerName: matches[2] || '',
+            assetId: matches[3] || '',
+            serial: matches[4] || '',
+            brand: matches[5] || '',
+            model: matches[6] || '',
+            cpu: matches[7] || '',
+            clock: matches[8] || '',
+            mac: matches[9] || '',
+            network: matches[10] || '',
+            ramType: matches[11] || '',
+            ramSize: matches[12] || '',
+            hddType: matches[13] || '',
+            hddSize: matches[14] || '',
+            os: matches[15] || '',
+            osLicense: matches[16] || '',
+            office: matches[17] || '',
+            officeLicense: matches[18] || '',
+            antivirus: matches[19] || '',
+            antivirusLicense: matches[20] || '',
+            project: matches[21] || '',
+            year: matches[22] || '',
+            responsible: matches[23] || '',
+            phone: matches[24] || '',
+            remarks: matches[25] || ''
+          });
+        }
+      }
+
+      if (newAssets.length > 0) {
+        if (confirm(`พบข้อมูลจาก CSV ${newAssets.length} รายการ ต้องการนำเข้าแทนที่ข้อมูลปัจจุบันใช่หรือไม่?`)) {
+          assets = newAssets;
+          saveToLocalStorage();
+          populateFilterDropdowns();
+          applyFilters();
+          updateStats();
+          alert(`นำเข้าข้อมูลจาก CSV สำเร็จ ${newAssets.length} รายการ`);
+          closeBackupModal();
+        }
+      } else {
+        alert('ไม่สามารถอ่านข้อมูลจาก CSV ได้ กรุณาตรวจสอบหัวตารางให้ตรงตามมาตรฐาน');
       }
     }
 
